@@ -8,8 +8,12 @@
     @Scripts.Render("~/bundles/modernizr")
 
 </head>
-<body ng-app="FetchNStore">
-    @*<h1>Test! Blah! 1+3={{1+3}}</h1>*@
+<body ng-app="FetchNStore" ng-controller="callCtrl">
+    <h1>Test! Blah! 1+3={{1+3}}</h1>
+
+    <p>Data : {{content}}</p>
+    <p>Status : {{statuscode}}</p>
+    <p>StatusText : {{statustext}}</p>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
