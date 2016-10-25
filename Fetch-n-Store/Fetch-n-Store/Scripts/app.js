@@ -2,15 +2,19 @@
 app.controller("callCtrl", function ($scope, $http, $document) {
     var url = $document.find("#urlInput").val();
     $scope.initiateRequest = () => {
-        //$http.get("http://httpstat.us/201")
-        $http.get(url)
-        .then(function (response) {
-            //$scope.content = response.data;
+        var startTime = Date.now();
+        var methodOfChoice = "GET";
+        $http({
+            method: methodOfChoice,
+            url: url
+        }).then(function successCallback(response) {
             console.log(response);
-            console.log(response.data);
             $scope.statusCode = response.status;
             $scope.statusText = response.statusText;
-            $scope.responseTime = Date.now();
+            $scope.responseTime = Date.now() - startTime;
+            console.log(startTime);
+        }, function errorCallback(response) {
+            console.log(response);
         });
     }
 });
