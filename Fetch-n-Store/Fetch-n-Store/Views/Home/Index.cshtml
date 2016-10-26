@@ -13,7 +13,6 @@
             <select id="methodSelector" name="methodSelector" 
                     ng-options="option.name for option in data.availableOptions track by option.id"
                     ng-model="data.selectedOption"></select>
-
             <input type="text" id="urlInput" width="200" name="name" value="" placeholder="Enter a URL" />
             <input type="submit" ng-click="initiateRequest()" class="btn-info" name="name" value="Fetch" />
             <input type="submit" class="btn-danger" name="name" value="Store" />
