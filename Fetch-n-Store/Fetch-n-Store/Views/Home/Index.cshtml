@@ -8,14 +8,16 @@
     <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>*@
 
     <div class="text-center">
-        <select>
-            <option>Select a method</option>
-            <option>GET</option>
-            <option>HEAD</option>
-        </select>
-        <input type="text" id="urlInput" width="200" name="name" value="" placeholder="Enter a URL"/>
-        <input type="submit" ng-click="initiateRequest()" class="btn-info" name="name" value="Fetch" />
-        <input type="submit" class="btn-danger" name="name" value="Store" />
+        <form name="myMethodForm">
+            <label for="methodSelector"> Select a method: </label>
+            <select id="methodSelector" name="methodSelector" 
+                    ng-options="option.name for option in data.availableOptions track by option.id"
+                    ng-model="data.selectedOption"></select>
+
+            <input type="text" id="urlInput" width="200" name="name" value="" placeholder="Enter a URL" />
+            <input type="submit" ng-click="initiateRequest()" class="btn-info" name="name" value="Fetch" />
+            <input type="submit" class="btn-danger" name="name" value="Store" />
+        </form>
     </div>
 </div>
 
