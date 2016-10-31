@@ -18,20 +18,23 @@ app.controller("callCtrl", function ($scope, $http, $document) {
             method: $scope.data.selectedOption.name,
             url: url
         }).then(function successCallback(response) {
-            $scope.data.optDefault = "blah"; // unclear why I need this honestly... 
+            $document.find("#error_display").html("");
             console.log(response);
             $scope.url = $document.find("#urlInput").val();
-            console.log($scope.data.selectedOption.name);
+            //console.log($scope.data.selectedOption.name);
             //$scope.methodUsed = $scope.data.toString();
             //console.log($scope.data.toString());
             //console.log(JSON.stringify($scope.data));
-            $scope.methodUsed = "GET";
+            $scope.methodUsed = $scope.data.selectedOption.name;
             $scope.statusCode = response.status;
             $scope.statusText = response.statusText;
-            $scope.responseTime = `${Date.now() - startTime} ms`;
-            //console.log(startTime);
+            $scope.responseTime = `${Date.now() - startTime} ms`;         
         }, function errorCallback(response) {
+            $document.find("#error_display").html(
+                `<p>Ooops, there was the following error: </p><p>${response}</p>`
+                );
             console.log(response);
+            
         });
     }
 });
