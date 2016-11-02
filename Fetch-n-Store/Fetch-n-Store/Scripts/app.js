@@ -10,6 +10,14 @@ app.controller("callCtrl", function ($scope, $http, $document) {
         selectedOption: { id: "1", name: "---Pick one---" }
     };
 
+    //$scope.storeResponse = () => {
+    //    $scope.
+    //}
+
+    //$scope.showAll = () => {
+    //    $scope.
+    //}
+
     $scope.initiateRequest = () => {
         var startTime = Date.now();
         $http({

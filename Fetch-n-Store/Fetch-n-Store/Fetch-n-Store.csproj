@@ -209,6 +209,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ResponseController.cs" />
     <Compile Include="DAL\Context.cs" />
     <Compile Include="DAL\Repo.cs" />
     <Compile Include="Global.asax.cs">
