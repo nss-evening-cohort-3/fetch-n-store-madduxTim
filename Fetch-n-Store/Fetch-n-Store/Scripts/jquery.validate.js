@@ -30,7 +30,7 @@ $.extend( $.fn, {
 		}
 
 		// Check if a validator for this form was already created
-		var validator = $.data( this[ 0 ], "validator" );
+		var validator = $.httpOptions( this[ 0 ], "validator" );
 		if ( validator ) {
 			return validator;
 		}
@@ -39,7 +39,7 @@ $.extend( $.fn, {
 		this.attr( "novalidate", "novalidate" );
 
 		validator = new $.validator( options, this[ 0 ] );
-		$.data( this[ 0 ], "validator", validator );
+		$.httpOptions( this[ 0 ], "validator", validator );
 
 		if ( validator.settings.onsubmit ) {
 
@@ -136,7 +136,7 @@ $.extend( $.fn, {
 	// http://jqueryvalidation.org/rules/
 	rules: function( command, argument ) {
 		var element = this[ 0 ],
-			settings, staticRules, existingRules, data, param, filtered;
+			settings, staticRules, existingRules, httpOptions, param, filtered;
 
 		// If nothing is selected, return empty object; can't chain anyway
 		if ( element == null || element.form == null ) {
@@ -144,7 +144,7 @@ $.extend( $.fn, {
 		}
 
 		if ( command ) {
-			settings = $.data( element.form, "validator" ).settings;
+			settings = $.httpOptions( element.form, "validator" ).settings;
 			staticRules = settings.rules;
 			existingRules = $.validator.staticRules( element );
 			switch ( command ) {
@@ -175,7 +175,7 @@ $.extend( $.fn, {
 			}
 		}
 
-		data = $.validator.normalizeRules(
+		httpOptions = $.validator.normalizeRules(
 		$.extend(
 			{},
 			$.validator.classRules( element ),
@@ -185,21 +185,21 @@ $.extend( $.fn, {
 		), element );
 
 		// Make sure required is at front
-		if ( data.required ) {
-			param = data.required;
-			delete data.required;
-			data = $.extend( { required: param }, data );
+		if ( httpOptions.required ) {
+			param = httpOptions.required;
+			delete httpOptions.required;
+			httpOptions = $.extend( { required: param }, httpOptions );
 			$( element ).attr( "aria-required", "true" );
 		}
 
 		// Make sure remote is at back
-		if ( data.remote ) {
-			param = data.remote;
-			delete data.remote;
-			data = $.extend( data, { remote: param } );
+		if ( httpOptions.remote ) {
+			param = httpOptions.remote;
+			delete httpOptions.remote;
+			httpOptions = $.extend( httpOptions, { remote: param } );
 		}
 
-		return data;
+		return httpOptions;
 	}
 } );
 
@@ -404,7 +404,7 @@ $.extend( $.validator, {
 					this.form = $( this ).closest( "form" )[ 0 ];
 				}
 
-				var validator = $.data( this.form, "validator" ),
+				var validator = $.httpOptions( this.form, "validator" ),
 					eventType = "on" + event.type.replace( /^validate/, "" ),
 					settings = validator.settings;
 				if ( settings[ eventType ] && !$( this ).is( settings.ignore ) ) {
@@ -429,7 +429,7 @@ $.extend( $.validator, {
 
 			// Add aria-required to any Static/Data/Class required fields before first validation
 			// Screen readers require this attribute to be present before the initial submission http://www.w3.org/TR/WCAG-TECHS/ARIA2.html
-			$( this.currentForm ).find( "[required], [data-rule-required], .required" ).attr( "aria-required", "true" );
+			$( this.currentForm ).find( "[required], [httpOptions-rule-required], .required" ).attr( "aria-required", "true" );
 		},
 
 		// http://jqueryvalidation.org/Validator.form/
@@ -796,11 +796,11 @@ $.extend( $.validator, {
 		},
 
 		// Return the custom message for the given element and validation method
-		// specified in the element's HTML5 data attribute
+		// specified in the element's HTML5 httpOptions attribute
 		// return the generic message if present and no method specific message is present
 		customDataMessage: function( element, method ) {
-			return $( element ).data( "msg" + method.charAt( 0 ).toUpperCase() +
-				method.substring( 1 ).toLowerCase() ) || $( element ).data( "msg" );
+			return $( element ).httpOptions( "msg" + method.charAt( 0 ).toUpperCase() +
+				method.substring( 1 ).toLowerCase() ) || $( element ).httpOptions( "msg" );
 		},
 
 		// Return the custom message for the given element name and validation method
@@ -1099,7 +1099,7 @@ $.extend( $.validator, {
 		previousValue: function( element, method ) {
 			method = typeof method === "string" && method || "remote";
 
-			return $.data( element, "previousValue" ) || $.data( element, "previousValue", {
+			return $.httpOptions( element, "previousValue" ) || $.httpOptions( element, "previousValue", {
 				old: null,
 				valid: true,
 				message: this.defaultMessage( element, { method: method } )
@@ -1218,7 +1218,7 @@ $.extend( $.validator, {
 			method, value;
 
 		for ( method in $.validator.methods ) {
-			value = $element.data( "rule" + method.charAt( 0 ).toUpperCase() + method.substring( 1 ).toLowerCase() );
+			value = $element.httpOptions( "rule" + method.charAt( 0 ).toUpperCase() + method.substring( 1 ).toLowerCase() );
 			this.normalizeAttributeRule( rules, type, method, value );
 		}
 		return rules;
@@ -1226,7 +1226,7 @@ $.extend( $.validator, {
 
 	staticRules: function( element ) {
 		var rules = {},
-			validator = $.data( element.form, "validator" );
+			validator = $.httpOptions( element.form, "validator" );
 
 		if ( validator.settings.rules ) {
 			rules = $.validator.normalizeRule( validator.settings.rules[ element.name ] ) || {};
@@ -1257,7 +1257,7 @@ $.extend( $.validator, {
 				if ( keepRule ) {
 					rules[ prop ] = val.param !== undefined ? val.param : true;
 				} else {
-					$.data( element.form, "validator" ).resetElements( $( element ) );
+					$.httpOptions( element.form, "validator" ).resetElements( $( element ) );
 					delete rules[ prop ];
 				}
 			}
@@ -1305,15 +1305,15 @@ $.extend( $.validator, {
 	},
 
 	// Converts a simple string to a {string: true} rule, e.g., "required" to {required:true}
-	normalizeRule: function( data ) {
-		if ( typeof data === "string" ) {
+	normalizeRule: function( httpOptions ) {
+		if ( typeof httpOptions === "string" ) {
 			var transformed = {};
-			$.each( data.split( /\s/ ), function() {
+			$.each( httpOptions.split( /\s/ ), function() {
 				transformed[ this ] = true;
 			} );
-			data = transformed;
+			httpOptions = transformed;
 		}
-		return data;
+		return httpOptions;
 	},
 
 	// http://jqueryvalidation.org/jQuery.validator.addMethod/
@@ -1480,7 +1480,7 @@ $.extend( $.validator, {
 			method = typeof method === "string" && method || "remote";
 
 			var previous = this.previousValue( element, method ),
-				validator, data, optionDataString;
+				validator, httpOptions, optionDataString;
 
 			if ( !this.settings.messages[ element.name ] ) {
 				this.settings.messages[ element.name ] = {};
@@ -1489,7 +1489,7 @@ $.extend( $.validator, {
 			this.settings.messages[ element.name ][ method ] = previous.message;
 
 			param = typeof param === "string" && { url: param } || param;
-			optionDataString = $.param( $.extend( { data: value }, param.data ) );
+			optionDataString = $.param( $.extend( { httpOptions: value }, param.httpOptions ) );
 			if ( previous.old === optionDataString ) {
 				return previous.valid;
 			}
@@ -1497,13 +1497,13 @@ $.extend( $.validator, {
 			previous.old = optionDataString;
 			validator = this;
 			this.startRequest( element );
-			data = {};
-			data[ element.name ] = value;
+			httpOptions = {};
+			httpOptions[ element.name ] = value;
 			$.ajax( $.extend( true, {
 				mode: "abort",
 				port: "validate" + element.name,
 				dataType: "json",
-				data: data,
+				httpOptions: httpOptions,
 				context: validator.currentForm,
 				success: function( response ) {
 					var valid = response === true || response === "true",

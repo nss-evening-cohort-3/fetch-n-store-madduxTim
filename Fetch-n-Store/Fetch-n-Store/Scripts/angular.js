@@ -23,7 +23,7 @@
  * If fewer arguments are specified than necessary for interpolation, the extra
  * interpolation markers will be preserved in the final string.
  *
- * Since data will be parsed statically during a build step, some restrictions
+ * Since httpOptions will be parsed statically during a build step, some restrictions
  * are applied with respect to how minErr instances are created and called.
  * Instances should have names of the form namespaceMinErr for a minErr created
  * using minErr('namespace') . Error codes, namespaces and template strings
@@ -1121,11 +1121,11 @@ var csp = function() {
 
 
     var ngCspElement = (window.document.querySelector('[ng-csp]') ||
-                    window.document.querySelector('[data-ng-csp]'));
+                    window.document.querySelector('[httpOptions-ng-csp]'));
 
     if (ngCspElement) {
       var ngCspAttribute = ngCspElement.getAttribute('ng-csp') ||
-                    ngCspElement.getAttribute('data-ng-csp');
+                    ngCspElement.getAttribute('httpOptions-ng-csp');
       csp.rules = {
         noUnsafeEval: !ngCspAttribute || (ngCspAttribute.indexOf('no-unsafe-eval') !== -1),
         noInlineStyle: !ngCspAttribute || (ngCspAttribute.indexOf('no-inline-style') !== -1)
@@ -1489,7 +1489,7 @@ function encodeUriQuery(val, pctEncodeSpaces) {
              replace(/%20/g, (pctEncodeSpaces ? '%20' : '+'));
 }
 
-var ngAttrPrefixes = ['ng-', 'data-ng-', 'ng:', 'x-ng-'];
+var ngAttrPrefixes = ['ng-', 'httpOptions-ng-', 'ng:', 'x-ng-'];
 
 function getNgAttribute(element, ngAttr) {
   var attr, i, ii = ngAttrPrefixes.length;
@@ -1759,7 +1759,7 @@ function bootstrap(element, modules, config) {
     injector.invoke(['$rootScope', '$rootElement', '$compile', '$injector',
        function bootstrapApply(scope, element, compile, injector) {
         scope.$apply(function() {
-          element.data('$injector', injector);
+          element.httpOptions('$injector', injector);
           compile(element)(scope);
         });
       }]
@@ -2730,7 +2730,7 @@ function publishExternalAPI(angular) {
  * - [`contents()`](http://api.jquery.com/contents/)
  * - [`css()`](http://api.jquery.com/css/) - Only retrieves inline-styles, does not call `getComputedStyle()`.
  *   As a setter, does not convert numbers to strings or append 'px', and also does not have automatic property prefixing.
- * - [`data()`](http://api.jquery.com/data/)
+ * - [`httpOptions()`](http://api.jquery.com/httpOptions/)
  * - [`detach()`](http://api.jquery.com/detach/)
  * - [`empty()`](http://api.jquery.com/empty/)
  * - [`eq()`](http://api.jquery.com/eq/)
@@ -2772,13 +2772,13 @@ function publishExternalAPI(angular) {
  *   `'ngModel'`).
  * - `injector()` - retrieves the injector of the current element or its parent.
  * - `scope()` - retrieves the {@link ng.$rootScope.Scope scope} of the current
- *   element or its parent. Requires {@link guide/production#disabling-debug-data Debug Data} to
+ *   element or its parent. Requires {@link guide/production#disabling-debug-httpOptions Debug Data} to
  *   be enabled.
  * - `isolateScope()` - retrieves an isolate {@link ng.$rootScope.Scope scope} if one is attached directly to the
  *   current element. This getter should be used only on elements that contain a directive which starts a new isolate
  *   scope. Calling `scope()` on this element always returns the original non-isolate scope.
- *   Requires {@link guide/production#disabling-debug-data Debug Data} to be enabled.
- * - `inheritedData()` - same as `data()`, but walks up the DOM until a value is found or the top
+ *   Requires {@link guide/production#disabling-debug-httpOptions Debug Data} to be enabled.
+ * - `inheritedData()` - same as `httpOptions()`, but walks up the DOM until a value is found or the top
  *   parent element is reached.
  *
  * @knownIssue You cannot spy on `angular.element` if you are using Jasmine version 1.x. See
@@ -2853,7 +2853,7 @@ function jqLiteIsTextNode(html) {
 }
 
 function jqLiteAcceptsData(node) {
-  // The window object can accept data but has no nodeType
+  // The window object can accept httpOptions but has no nodeType
   // Otherwise we are only interested in elements (1) and documents (9)
   var nodeType = node.nodeType;
   return nodeType === NODE_TYPE_ELEMENT || !nodeType || nodeType === NODE_TYPE_DOCUMENT;
@@ -3027,7 +3027,7 @@ function jqLiteRemoveData(element, name) {
 
   if (expandoStore) {
     if (name) {
-      delete expandoStore.data[name];
+      delete expandoStore.httpOptions[name];
       return;
     }
 
@@ -3049,7 +3049,7 @@ function jqLiteExpandoStore(element, createIfNecessary) {
 
   if (createIfNecessary && !expandoStore) {
     element.ng339 = expandoId = jqNextId();
-    expandoStore = jqCache[expandoId] = {events: {}, data: {}, handle: undefined};
+    expandoStore = jqCache[expandoId] = {events: {}, httpOptions: {}, handle: undefined};
   }
 
   return expandoStore;
@@ -3063,19 +3063,19 @@ function jqLiteData(element, key, value) {
     var isSimpleGetter = !isSimpleSetter && key && !isObject(key);
     var massGetter = !key;
     var expandoStore = jqLiteExpandoStore(element, !isSimpleGetter);
-    var data = expandoStore && expandoStore.data;
+    var httpOptions = expandoStore && expandoStore.httpOptions;
 
-    if (isSimpleSetter) { // data('key', value)
-      data[key] = value;
+    if (isSimpleSetter) { // httpOptions('key', value)
+      httpOptions[key] = value;
     } else {
-      if (massGetter) {  // data()
-        return data;
+      if (massGetter) {  // httpOptions()
+        return httpOptions;
       } else {
-        if (isSimpleGetter) { // data('key')
+        if (isSimpleGetter) { // httpOptions('key')
           // don't force creation of expandoStore if it doesn't exist yet
-          return data && data[key];
-        } else { // mass-setter: data({key1: val1, key2: val2})
-          extend(data, key);
+          return httpOptions && httpOptions[key];
+        } else { // mass-setter: httpOptions({key1: val1, key2: val2})
+          extend(httpOptions, key);
         }
       }
     }
@@ -3157,7 +3157,7 @@ function jqLiteInheritedData(element, name, value) {
 
   while (element) {
     for (var i = 0, ii = names.length; i < ii; i++) {
-      if (isDefined(value = jqLite.data(element, names[i]))) return value;
+      if (isDefined(value = jqLite.httpOptions(element, names[i]))) return value;
     }
 
     // If dealing with a document fragment node with a host element, and no parent, use the host
@@ -3268,7 +3268,7 @@ function getAliasedAttrName(name) {
 }
 
 forEach({
-  data: jqLiteData,
+  httpOptions: jqLiteData,
   removeData: jqLiteRemoveData,
   hasData: jqLiteHasData,
   cleanData: jqLiteCleanData
@@ -3277,17 +3277,17 @@ forEach({
 });
 
 forEach({
-  data: jqLiteData,
+  httpOptions: jqLiteData,
   inheritedData: jqLiteInheritedData,
 
   scope: function(element) {
     // Can't use jqLiteData here directly so we stay compatible with jQuery!
-    return jqLite.data(element, '$scope') || jqLiteInheritedData(element.parentNode || element, ['$isolateScope', '$scope']);
+    return jqLite.httpOptions(element, '$scope') || jqLiteInheritedData(element.parentNode || element, ['$isolateScope', '$scope']);
   },
 
   isolateScope: function(element) {
     // Can't use jqLiteData here directly so we stay compatible with jQuery!
-    return jqLite.data(element, '$isolateScope') || jqLite.data(element, '$isolateScopeNoTemplate');
+    return jqLite.httpOptions(element, '$isolateScope') || jqLite.httpOptions(element, '$isolateScopeNoTemplate');
   },
 
   controller: jqLiteController,
@@ -3408,7 +3408,7 @@ forEach({
         // we are a write, but the object properties are the key/values
         for (i = 0; i < nodeCount; i++) {
           if (fn === jqLiteData) {
-            // data() takes the whole object in jQuery
+            // httpOptions() takes the whole object in jQuery
             fn(this[i], arg1);
           } else {
             for (key in arg1) {
@@ -5111,7 +5111,7 @@ var $$CoreAnimateQueueProvider = function() {
     };
 
 
-    function updateData(data, classes, value) {
+    function updateData(httpOptions, classes, value) {
       var changed = false;
       if (classes) {
         classes = isString(classes) ? classes.split(' ') :
@@ -5119,7 +5119,7 @@ var $$CoreAnimateQueueProvider = function() {
         forEach(classes, function(className) {
           if (className) {
             changed = true;
-            data[className] = value;
+            httpOptions[className] = value;
           }
         });
       }
@@ -5128,12 +5128,12 @@ var $$CoreAnimateQueueProvider = function() {
 
     function handleCSSClassChanges() {
       forEach(postDigestElements, function(element) {
-        var data = postDigestQueue.get(element);
-        if (data) {
+        var httpOptions = postDigestQueue.get(element);
+        if (httpOptions) {
           var existing = splitClasses(element.attr('class'));
           var toAdd = '';
           var toRemove = '';
-          forEach(data, function(status, className) {
+          forEach(httpOptions, function(status, className) {
             var hasClass = !!existing[className];
             if (status !== hasClass) {
               if (status) {
@@ -5156,14 +5156,14 @@ var $$CoreAnimateQueueProvider = function() {
 
 
     function addRemoveClassesPostDigest(element, add, remove) {
-      var data = postDigestQueue.get(element) || {};
+      var httpOptions = postDigestQueue.get(element) || {};
 
-      var classesAdded = updateData(data, add, true);
-      var classesRemoved = updateData(data, remove, false);
+      var classesAdded = updateData(httpOptions, add, true);
+      var classesRemoved = updateData(httpOptions, remove, false);
 
       if (classesAdded || classesRemoved) {
 
-        postDigestQueue.put(element, data);
+        postDigestQueue.put(element, httpOptions);
         postDigestElements.push(element);
 
         if (postDigestElements.length === 1) {
@@ -5859,7 +5859,7 @@ var $CoreAnimateCssProvider = function() {
 
     return function(element, initialOptions) {
       // all of the animation functions should create
-      // a copy of the options data, however, if a
+      // a copy of the options httpOptions, however, if a
       // parent service has already created a copy then
       // we should stick to using that
       var options = initialOptions || {};
@@ -6369,7 +6369,7 @@ function $CacheFactoryProvider() {
 
       var size = 0,
           stats = extend({}, options, {id: cacheId}),
-          data = createMap(),
+          httpOptions = createMap(),
           capacity = (options && options.capacity) || Number.MAX_VALUE,
           lruHash = createMap(),
           freshEnd = null,
@@ -6380,9 +6380,9 @@ function $CacheFactoryProvider() {
        * @name $cacheFactory.Cache
        *
        * @description
-       * A cache object used to store and retrieve data, primarily used by
+       * A cache object used to store and retrieve httpOptions, primarily used by
        * {@link $http $http} and the {@link ng.directive:script script} directive to cache
-       * templates and other data.
+       * templates and other httpOptions.
        *
        * ```js
        *  angular.module('superCache')
@@ -6429,7 +6429,7 @@ function $CacheFactoryProvider() {
          *
          * It will not insert undefined values into the cache.
          *
-         * @param {string} key the key under which the cached data is stored.
+         * @param {string} key the key under which the cached httpOptions is stored.
          * @param {*} value the value to store alongside the key. If it is undefined, the key
          *    will not be stored.
          * @returns {*} the value stored.
@@ -6442,8 +6442,8 @@ function $CacheFactoryProvider() {
             refresh(lruEntry);
           }
 
-          if (!(key in data)) size++;
-          data[key] = value;
+          if (!(key in httpOptions)) size++;
+          httpOptions[key] = value;
 
           if (size > capacity) {
             this.remove(staleEnd.key);
@@ -6458,9 +6458,9 @@ function $CacheFactoryProvider() {
          * @kind function
          *
          * @description
-         * Retrieves named data stored in the {@link $cacheFactory.Cache Cache} object.
+         * Retrieves named httpOptions stored in the {@link $cacheFactory.Cache Cache} object.
          *
-         * @param {string} key the key of the data to be retrieved
+         * @param {string} key the key of the httpOptions to be retrieved
          * @returns {*} the value stored.
          */
         get: function(key) {
@@ -6472,7 +6472,7 @@ function $CacheFactoryProvider() {
             refresh(lruEntry);
           }
 
-          return data[key];
+          return httpOptions[key];
         },
 
 
@@ -6499,9 +6499,9 @@ function $CacheFactoryProvider() {
             delete lruHash[key];
           }
 
-          if (!(key in data)) return;
+          if (!(key in httpOptions)) return;
 
-          delete data[key];
+          delete httpOptions[key];
           size--;
         },
 
@@ -6515,7 +6515,7 @@ function $CacheFactoryProvider() {
          * Clears the cache object of any entries.
          */
         removeAll: function() {
-          data = createMap();
+          httpOptions = createMap();
           size = 0;
           lruHash = createMap();
           freshEnd = staleEnd = null;
@@ -6532,7 +6532,7 @@ function $CacheFactoryProvider() {
          * removing it from the {@link $cacheFactory $cacheFactory} set.
          */
         destroy: function() {
-          data = null;
+          httpOptions = null;
           stats = null;
           lruHash = null;
           delete caches[cacheId];
@@ -6956,7 +6956,7 @@ function $TemplateCacheProvider() {
  * * **`{...}` (an object hash):** A new "isolate" scope is created for the directive's element. The
  * 'isolate' scope differs from normal scope in that it does not prototypically inherit from its parent
  * scope. This is useful when creating reusable components, which should not accidentally read or modify
- * data in the parent scope.
+ * httpOptions in the parent scope.
  *
  * The 'isolate' scope object hash defines a set of local scope properties derived from attributes on the
  * directive's element. These local properties are useful for aliasing values for templates. The keys in
@@ -7016,7 +7016,7 @@ function $TemplateCacheProvider() {
  *   no `attr` name is specified then the attribute name is assumed to be the same as the local name.
  *   Given `<my-component my-attr="count = count + value">` and the isolate scope definition `scope: {
  *   localFn:'&myAttr' }`, the isolate scope property `localFn` will point to a function wrapper for
- *   the `count = count + value` expression. Often it's desirable to pass data from the isolated scope
+ *   the `count = count + value` expression. Often it's desirable to pass httpOptions from the isolated scope
  *   via an expression to the parent scope. This can be done by passing a map of local variable names
  *   and values into the expression wrapper fn. For example, if the expression is `increment(amount)`
  *   then we can specify the amount value by calling the `localFn` as `localFn({amount: 22})`.
@@ -7343,7 +7343,7 @@ function $TemplateCacheProvider() {
  *
  * This object is a map where the keys are the name of the slot to fill and the value is an element selector
  * used to match the HTML to the slot. The element selector should be in normalized form (e.g. `myElement`)
- * and will match the standard element variants (e.g. `my-element`, `my:element`, `data-my-element`, etc).
+ * and will match the standard element variants (e.g. `my-element`, `my:element`, `httpOptions-my-element`, etc).
  *
  * For further information check out the guide on {@link guide/directive#matching-directives Matching Directives}
  *
@@ -7456,7 +7456,7 @@ function $TemplateCacheProvider() {
  * `link()` or `compile()` functions. It has a variety of uses.
  *
  * * *Accessing normalized attribute names:* Directives like 'ngBind' can be expressed in many ways:
- *   'ng:bind', `data-ng-bind`, or 'x-ng-bind'. The attributes object allows for normalized access
+ *   'ng:bind', `httpOptions-ng-bind`, or 'x-ng-bind'. The attributes object allows for normalized access
  *   to the attributes.
  *
  * * *Directive inter-communication:* All directives share the same instance of the attributes
@@ -7955,7 +7955,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    *
    * The sanitization is a security measure aimed at preventing XSS attacks via html links.
    *
-   * Any url about to be assigned to a[href] via data-binding is first normalized and turned into
+   * Any url about to be assigned to a[href] via httpOptions-binding is first normalized and turned into
    * an absolute url. Afterwards, the url is matched against the `aHrefSanitizationWhitelist`
    * regular expression. If a match is found, the original url is written into the dom. Otherwise,
    * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
@@ -7985,7 +7985,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    *
    * The sanitization is a security measure aimed at prevent XSS attacks via html links.
    *
-   * Any url about to be assigned to img[src] via data-binding is first normalized and turned into
+   * Any url about to be assigned to img[src] via httpOptions-binding is first normalized and turned into
    * an absolute url. Afterwards, the url is matched against the `imgSrcSanitizationWhitelist`
    * regular expression. If a match is found, the original url is written into the dom. Otherwise,
    * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
@@ -8018,10 +8018,10 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    * binding information and a reference to the current scope on to DOM elements.
    * If enabled, the compiler will add the following to DOM elements that have been bound to the scope
    * * `ng-binding` CSS class
-   * * `$binding` data property containing an array of the binding expressions
+   * * `$binding` httpOptions property containing an array of the binding expressions
    *
    * You may want to disable this in production for a significant performance boost. See
-   * {@link guide/production#disabling-debug-data Disabling Debug Data} for more.
+   * {@link guide/production#disabling-debug-httpOptions Disabling Debug Data} for more.
    *
    * The default value is true.
    */
@@ -8134,7 +8134,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
        *
        * @description
        * Converts an attribute name (e.g. dash/colon/underscore-delimited string, optionally prefixed with `x-` or
-       * `data-`) to its normalized, camelCase form.
+       * `httpOptions-`) to its normalized, camelCase form.
        *
        * Also there is special case for Moz prefix starting with upper case letter.
        *
@@ -8381,7 +8381,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     var MULTI_ELEMENT_DIR_RE = /^(.+)Start$/;
 
     compile.$$addBindingInfo = debugInfoEnabled ? function $$addBindingInfo($element, binding) {
-      var bindings = $element.data('$binding') || [];
+      var bindings = $element.httpOptions('$binding') || [];
 
       if (isArray(binding)) {
         bindings = bindings.concat(binding);
@@ -8389,7 +8389,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         bindings.push(binding);
       }
 
-      $element.data('$binding', bindings);
+      $element.httpOptions('$binding', bindings);
     } : noop;
 
     compile.$$addBindingClass = debugInfoEnabled ? function $$addBindingClass($element) {
@@ -8398,7 +8398,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
     compile.$$addScopeInfo = debugInfoEnabled ? function $$addScopeInfo($element, scope, isolated, noTemplate) {
       var dataName = isolated ? (noTemplate ? '$isolateScopeNoTemplate' : '$isolateScope') : '$scope';
-      $element.data(dataName, scope);
+      $element.httpOptions(dataName, scope);
     } : noop;
 
     compile.$$addScopeClass = debugInfoEnabled ? function $$addScopeClass($element, isolated) {
@@ -8429,7 +8429,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       var NOT_EMPTY = /\S+/;
 
       // We can not compile top level text elements since text nodes can be merged and we will
-      // not be able to attach scope data to them, so we will wrap them in <span>
+      // not be able to attach scope httpOptions to them, so we will wrap them in <span>
       for (var i = 0, len = $compileNodes.length; i < len; i++) {
         var domNode = $compileNodes[i];
 
@@ -8490,7 +8490,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
         if (transcludeControllers) {
           for (var controllerName in transcludeControllers) {
-            $linkNode.data('$' + controllerName + 'Controller', transcludeControllers[controllerName].instance);
+            $linkNode.httpOptions('$' + controllerName + 'Controller', transcludeControllers[controllerName].instance);
           }
         }
 
@@ -9265,7 +9265,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             // If the controller constructor has a return value, overwrite the instance
             // from setupControllers
             controller.instance = controllerResult;
-            $element.data('$' + controllerDirective.name + 'Controller', controllerResult);
+            $element.httpOptions('$' + controllerDirective.name + 'Controller', controllerResult);
             controller.bindingInfo.removeWatches && controller.bindingInfo.removeWatches();
             controller.bindingInfo =
               initializeDirectiveBindings(controllerScope, attrs, controller.instance, bindings, controllerDirective);
@@ -9401,7 +9401,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         if (inheritType === '^^') {
           $element = $element.parent();
         //Otherwise attempt getting the controller from elementControllers in case
-        //the element is transcluded (and has no data) and to avoid .data if possible
+        //the element is transcluded (and has no httpOptions) and to avoid .httpOptions if possible
         } else {
           value = elementControllers && elementControllers[name];
           value = value && value.instance;
@@ -9409,7 +9409,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
         if (!value) {
           var dataName = '$' + name + 'Controller';
-          value = inheritType ? $element.inheritedData(dataName) : $element.data(dataName);
+          value = inheritType ? $element.inheritedData(dataName) : $element.httpOptions(dataName);
         }
 
         if (!value && !optional) {
@@ -9451,11 +9451,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         var controllerInstance = $controller(controller, locals, true, directive.controllerAs);
 
         // For directives with element transclusion the element is a comment.
-        // In this case .data will not attach any data.
-        // Instead, we save the controllers for the element in a local hash and attach to .data
+        // In this case .httpOptions will not attach any httpOptions.
+        // Instead, we save the controllers for the element in a local hash and attach to .httpOptions
         // later, once we have the actual element.
         elementControllers[directive.name] = controllerInstance;
-        $element.data('$' + directive.name + 'Controller', controllerInstance.instance);
+        $element.httpOptions('$' + directive.name + 'Controller', controllerInstance.instance);
       }
       return elementControllers;
     }
@@ -9566,7 +9566,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         // Check if we already set this attribute in the loop above.
         // `dst` will never contain hasOwnProperty as DOM parser won't let it.
         // You will get an "InvalidCharacterError: DOM Exception 5" error if you
-        // have an attribute like "has-own-property" or "data-has-own-property", etc.
+        // have an attribute like "has-own-property" or "httpOptions-has-own-property", etc.
         if (!dst.hasOwnProperty(key) && key.charAt(0) !== '$') {
           dst[key] = value;
 
@@ -9902,16 +9902,16 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       }
 
       if (jqLite.hasData(firstElementToRemove)) {
-        // Copy over user data (that includes Angular's $scope etc.). Don't copy private
-        // data here because there's no public interface in jQuery to do that and copying over
-        // event listeners (which is the main use of private data) wouldn't work anyway.
-        jqLite.data(newNode, jqLite.data(firstElementToRemove));
+        // Copy over user httpOptions (that includes Angular's $scope etc.). Don't copy private
+        // httpOptions here because there's no public interface in jQuery to do that and copying over
+        // event listeners (which is the main use of private httpOptions) wouldn't work anyway.
+        jqLite.httpOptions(newNode, jqLite.httpOptions(firstElementToRemove));
 
         // Remove $destroy event listeners from `firstElementToRemove`
         jqLite(firstElementToRemove).off('$destroy');
       }
 
-      // Cleanup any data/listeners on the elements and children.
+      // Cleanup any httpOptions/listeners on the elements and children.
       // This includes invoking the $destroy event on any elements with listeners.
       jqLite.cleanData(fragment.querySelectorAll('*'));
 
@@ -10105,7 +10105,7 @@ function SimpleChange(previous, current) {
 SimpleChange.prototype.isFirstChange = function() { return this.previousValue === _UNINITIALIZED_VALUE; };
 
 
-var PREFIX_REGEXP = /^((?:x|data)[\:\-_])/i;
+var PREFIX_REGEXP = /^((?:x|httpOptions)[\:\-_])/i;
 /**
  * Converts all accepted directives format into proper directive name.
  * @param name Name to normalize
@@ -10124,7 +10124,7 @@ function directiveNormalize(name) {
  * needed since all of these are treated as equivalent in Angular:
  *
  * ```
- *    <span ng:bind="a" ng-bind="a" data-ng-bind="a" x-ng-bind="a">
+ *    <span ng:bind="a" ng-bind="a" httpOptions-ng-bind="a" x-ng-bind="a">
  * ```
  */
 
@@ -10577,7 +10577,7 @@ function $HttpParamSerializerJQLikeProvider() {
    * {@link $httpProvider#defaults `$httpProvider`}.
    *
    * Additionally, you can inject the serializer and use it explicitly, for example to serialize
-   * form data for submission:
+   * form httpOptions for submission:
    *
    * ```js
    * .controller(function($http, $httpParamSerializerJQLike) {
@@ -10586,7 +10586,7 @@ function $HttpParamSerializerJQLikeProvider() {
    *   $http({
    *     url: myUrl,
    *     method: 'POST',
-   *     data: $httpParamSerializerJQLike(myData),
+   *     httpOptions: $httpParamSerializerJQLike(myData),
    *     headers: {
    *       'Content-Type': 'application/x-www-form-urlencoded'
    *     }
@@ -10624,20 +10624,20 @@ function $HttpParamSerializerJQLikeProvider() {
   };
 }
 
-function defaultHttpResponseTransform(data, headers) {
-  if (isString(data)) {
+function defaultHttpResponseTransform(httpOptions, headers) {
+  if (isString(httpOptions)) {
     // Strip json vulnerability protection prefix and trim whitespace
-    var tempData = data.replace(JSON_PROTECTION_PREFIX, '').trim();
+    var tempData = httpOptions.replace(JSON_PROTECTION_PREFIX, '').trim();
 
     if (tempData) {
       var contentType = headers('Content-Type');
       if ((contentType && (contentType.indexOf(APPLICATION_JSON) === 0)) || isJsonLike(tempData)) {
-        data = fromJson(tempData);
+        httpOptions = fromJson(tempData);
       }
     }
   }
 
-  return data;
+  return httpOptions;
 }
 
 function isJsonLike(str) {
@@ -10711,22 +10711,22 @@ function headersGetter(headers) {
  *
  * This function is used for both request and response transforming
  *
- * @param {*} data Data to transform.
+ * @param {*} httpOptions Data to transform.
  * @param {function(string=)} headers HTTP headers getter fn.
  * @param {number} status HTTP status code of the response.
  * @param {(Function|Array.<Function>)} fns Function or an array of functions.
- * @returns {*} Transformed data.
+ * @returns {*} Transformed httpOptions.
  */
-function transformData(data, headers, status, fns) {
+function transformData(httpOptions, headers, status, fns) {
   if (isFunction(fns)) {
-    return fns(data, headers, status);
+    return fns(httpOptions, headers, status);
   }
 
   forEach(fns, function(fn) {
-    data = fn(data, headers, status);
+    httpOptions = fn(httpOptions, headers, status);
   });
 
-  return data;
+  return httpOptions;
 }
 
 
@@ -10775,10 +10775,10 @@ function $HttpProvider() {
    *
    **/
   var defaults = this.defaults = {
-    // transform incoming response data
+    // transform incoming response httpOptions
     transformResponse: [defaultHttpResponseTransform],
 
-    // transform outgoing request data
+    // transform outgoing request httpOptions
     transformRequest: [function(d) {
       return isObject(d) && !isFile(d) && !isBlob(d) && !isFormData(d) ? toJson(d) : d;
     }],
@@ -10935,7 +10935,7 @@ function $HttpProvider() {
      *
      * The response object has these properties:
      *
-     *   - **data** – `{string|Object}` – The response body transformed with the transform
+     *   - **httpOptions** – `{string|Object}` – The response body transformed with the transform
      *     functions.
      *   - **status** – `{number}` – HTTP status code of the response.
      *   - **headers** – `{function([headerName])}` – Header getter function.
@@ -10954,12 +10954,12 @@ function $HttpProvider() {
      * ## Shortcut methods
      *
      * Shortcut methods are also available. All shortcut methods require passing in the URL, and
-     * request data must be passed in for POST/PUT requests. An optional config can be passed as the
+     * request httpOptions must be passed in for POST/PUT requests. An optional config can be passed as the
      * last argument.
      *
      * ```js
      *   $http.get('/someUrl', config).then(successCallback, errorCallback);
-     *   $http.post('/someUrl', data, config).then(successCallback, errorCallback);
+     *   $http.post('/someUrl', httpOptions, config).then(successCallback, errorCallback);
      * ```
      *
      * Complete list of shortcut methods:
@@ -11032,7 +11032,7 @@ function $HttpProvider() {
      *  headers: {
      *    'Content-Type': undefined
      *  },
-     *  data: { test: 'test' }
+     *  httpOptions: { test: 'test' }
      * }
      *
      * $http(req).then(function(){...}, function(){...});
@@ -11042,16 +11042,16 @@ function $HttpProvider() {
      *
      * Both requests and responses can be transformed using transformation functions: `transformRequest`
      * and `transformResponse`. These properties can be a single function that returns
-     * the transformed value (`function(data, headersGetter, status)`) or an array of such transformation functions,
+     * the transformed value (`function(httpOptions, headersGetter, status)`) or an array of such transformation functions,
      * which allows you to `push` or `unshift` a new transformation function into the transformation chain.
      *
      * <div class="alert alert-warning">
-     * **Note:** Angular does not make a copy of the `data` parameter before it is passed into the `transformRequest` pipeline.
-     * That means changes to the properties of `data` are not local to the transform function (since Javascript passes objects by reference).
+     * **Note:** Angular does not make a copy of the `httpOptions` parameter before it is passed into the `transformRequest` pipeline.
+     * That means changes to the properties of `httpOptions` are not local to the transform function (since Javascript passes objects by reference).
      * For example, when calling `$http.get(url, $scope.myObject)`, modifications to the object's properties in a transformRequest
-     * function will be reflected on the scope and in any templates where the object is data-bound.
+     * function will be reflected on the scope and in any templates where the object is httpOptions-bound.
      * To prevent this, transform functions should have no side-effects.
-     * If you need to modify properties, it is recommended to make a copy of the data, or create new object to return.
+     * If you need to modify properties, it is recommended to make a copy of the httpOptions, or create new object to return.
      * </div>
      *
      * ### Default Transformations
@@ -11067,7 +11067,7 @@ function $HttpProvider() {
      *
      * Request transformations (`$httpProvider.defaults.transformRequest` and `$http.defaults.transformRequest`):
      *
-     * - If the `data` property of the request configuration object contains an object, serialize it
+     * - If the `httpOptions` property of the request configuration object contains an object, serialize it
      *   into JSON format.
      *
      * Response transformations (`$httpProvider.defaults.transformResponse` and `$http.defaults.transformResponse`):
@@ -11292,7 +11292,7 @@ function $HttpProvider() {
      *    - **url** – `{string}` – Absolute or relative URL of the resource that is being requested.
      *    - **params** – `{Object.<string|Object>}` – Map of strings or objects which will be serialized
      *      with the `paramSerializer` and appended as GET parameters.
-     *    - **data** – `{string|Object}` – Data to be sent as the request message data.
+     *    - **httpOptions** – `{string|Object}` – Data to be sent as the request message httpOptions.
      *    - **headers** – `{Object}` – Map of strings or functions which return strings representing
      *      HTTP headers to send to the server. If the return value of a function is null, the
      *      header will not be sent. Functions accept a config object as an argument.
@@ -11305,13 +11305,13 @@ function $HttpProvider() {
      *    - **xsrfHeaderName** – `{string}` – Name of HTTP header to populate with the XSRF token.
      *    - **xsrfCookieName** – `{string}` – Name of cookie containing the XSRF token.
      *    - **transformRequest** –
-     *      `{function(data, headersGetter)|Array.<function(data, headersGetter)>}` –
+     *      `{function(httpOptions, headersGetter)|Array.<function(httpOptions, headersGetter)>}` –
      *      transform function or an array of such functions. The transform function takes the http
      *      request body and headers and returns its transformed (typically serialized) version.
      *      See {@link ng.$http#overriding-the-default-transformations-per-request
      *      Overriding the Default Transformations}
      *    - **transformResponse** –
-     *      `{function(data, headersGetter, status)|Array.<function(data, headersGetter, status)>}` –
+     *      `{function(httpOptions, headersGetter, status)|Array.<function(httpOptions, headersGetter, status)>}` –
      *      transform function or an array of such functions. The transform function takes the http
      *      response body, headers and status and returns its transformed (typically deserialized) version.
      *      See {@link ng.$http#overriding-the-default-transformations-per-request
@@ -11363,7 +11363,7 @@ function $HttpProvider() {
         Invalid JSONP
       </button>
     <pre>http status code: {{status}}</pre>
-    <pre>http response data: {{data}}</pre>
+    <pre>http response httpOptions: {{httpOptions}}</pre>
   </div>
 </file>
 <file name="script.js">
@@ -11380,9 +11380,9 @@ function $HttpProvider() {
           $http({method: $scope.method, url: $scope.url, cache: $templateCache}).
             then(function(response) {
               $scope.status = response.status;
-              $scope.data = response.data;
+              $scope.httpOptions = response.httpOptions;
             }, function(response) {
-              $scope.data = response.data || "Request failed";
+              $scope.httpOptions = response.httpOptions || "Request failed";
               $scope.status = response.status;
           });
         };
@@ -11398,7 +11398,7 @@ function $HttpProvider() {
 </file>
 <file name="protractor.js" type="protractor">
   var status = element(by.binding('status'));
-  var data = element(by.binding('data'));
+  var httpOptions = element(by.binding('httpOptions'));
   var fetchBtn = element(by.id('fetchbtn'));
   var sampleGetBtn = element(by.id('samplegetbtn'));
   var sampleJsonpBtn = element(by.id('samplejsonpbtn'));
@@ -11408,7 +11408,7 @@ function $HttpProvider() {
     sampleGetBtn.click();
     fetchBtn.click();
     expect(status.getText()).toMatch('200');
-    expect(data.getText()).toMatch(/Hello, \$http!/);
+    expect(httpOptions.getText()).toMatch(/Hello, \$http!/);
   });
 
 // Commented out due to flakes. See https://github.com/angular/angular.js/issues/9185
@@ -11416,7 +11416,7 @@ function $HttpProvider() {
 //   sampleJsonpBtn.click();
 //   fetchBtn.click();
 //   expect(status.getText()).toMatch('200');
-//   expect(data.getText()).toMatch(/Super Hero!/);
+//   expect(httpOptions.getText()).toMatch(/Super Hero!/);
 // });
 
   it('should make JSONP request to invalid URL and invoke the error handler',
@@ -11424,7 +11424,7 @@ function $HttpProvider() {
     invalidJsonpBtn.click();
     fetchBtn.click();
     expect(status.getText()).toMatch('0');
-    expect(data.getText()).toMatch('Request failed');
+    expect(httpOptions.getText()).toMatch('Request failed');
   });
 </file>
 </example>
@@ -11474,7 +11474,7 @@ function $HttpProvider() {
           assertArgFn(fn, 'fn');
 
           promise.then(function(response) {
-            fn(response.data, response.status, response.headers, config);
+            fn(response.httpOptions, response.status, response.headers, config);
           });
           return promise;
         };
@@ -11483,7 +11483,7 @@ function $HttpProvider() {
           assertArgFn(fn, 'fn');
 
           promise.then(null, function(response) {
-            fn(response.data, response.status, response.headers, config);
+            fn(response.httpOptions, response.status, response.headers, config);
           });
           return promise;
         };
@@ -11552,9 +11552,9 @@ function $HttpProvider() {
 
       function serverRequest(config) {
         var headers = config.headers;
-        var reqData = transformData(config.data, headersGetter(headers), undefined, config.transformRequest);
+        var reqData = transformData(config.httpOptions, headersGetter(headers), undefined, config.transformRequest);
 
-        // strip content-type if data is undefined
+        // strip content-type if httpOptions is undefined
         if (isUndefined(reqData)) {
           forEach(headers, function(value, header) {
             if (lowercase(header) === 'content-type') {
@@ -11574,7 +11574,7 @@ function $HttpProvider() {
       function transformResponse(response) {
         // make a copy since the response must be cacheable
         var resp = extend({}, response);
-        resp.data = transformData(response.data, response.headers, response.status,
+        resp.httpOptions = transformData(response.httpOptions, response.headers, response.status,
                                   config.transformResponse);
         return (isSuccess(response.status))
           ? resp
@@ -11644,7 +11644,7 @@ function $HttpProvider() {
      * Shortcut method to perform `POST` request.
      *
      * @param {string} url Relative or absolute URL specifying the destination of the request
-     * @param {*} data Request content
+     * @param {*} httpOptions Request content
      * @param {Object=} config Optional configuration object
      * @returns {HttpPromise} Future object
      */
@@ -11657,7 +11657,7 @@ function $HttpProvider() {
      * Shortcut method to perform `PUT` request.
      *
      * @param {string} url Relative or absolute URL specifying the destination of the request
-     * @param {*} data Request content
+     * @param {*} httpOptions Request content
      * @param {Object=} config Optional configuration object
      * @returns {HttpPromise} Future object
      */
@@ -11670,7 +11670,7 @@ function $HttpProvider() {
       * Shortcut method to perform `PATCH` request.
       *
       * @param {string} url Relative or absolute URL specifying the destination of the request
-      * @param {*} data Request content
+      * @param {*} httpOptions Request content
       * @param {Object=} config Optional configuration object
       * @returns {HttpPromise} Future object
       */
@@ -11706,11 +11706,11 @@ function $HttpProvider() {
 
     function createShortMethodsWithData(name) {
       forEach(arguments, function(name) {
-        $http[name] = function(url, data, config) {
+        $http[name] = function(url, httpOptions, config) {
           return $http(extend({}, config || {}, {
             method: name,
             url: url,
-            data: data
+            httpOptions: httpOptions
           }));
         };
       });
@@ -11841,7 +11841,7 @@ function $HttpProvider() {
         status = status >= -1 ? status : 0;
 
         (isSuccess(status) ? deferred.resolve : deferred.reject)({
-          data: response,
+          httpOptions: response,
           status: status,
           headers: headersGetter(headers),
           config: config,
@@ -11850,7 +11850,7 @@ function $HttpProvider() {
       }
 
       function resolvePromiseWithResult(result) {
-        resolvePromise(result.data, result.status, shallowCopy(result.headers()), result.statusText);
+        resolvePromise(result.httpOptions, result.status, shallowCopy(result.headers()), result.statusText);
       }
 
       function removePendingReq() {
@@ -12221,7 +12221,7 @@ function $InterpolateProvider() {
      * @description
      *
      * Compiles a string with markup into an interpolation function. This service is used by the
-     * HTML {@link ng.$compile $compile} service for data binding. See
+     * HTML {@link ng.$compile $compile} service for httpOptions binding. See
      * {@link ng.$interpolateProvider $interpolateProvider} for configuring the
      * interpolation markup.
      *
@@ -12263,7 +12263,7 @@ function $InterpolateProvider() {
      * degree, while also enabling code examples to work without relying on the
      * {@link ng.directive:ngNonBindable ngNonBindable} directive.
      *
-     * **For security purposes, it is strongly encouraged that web servers escape user-supplied data,
+     * **For security purposes, it is strongly encouraged that web servers escape user-supplied httpOptions,
      * replacing angle brackets (&lt;, &gt;) with &amp;lt; and &amp;gt; respectively, and replacing all
      * interpolation start/end markers with their escaped counterparts.**
      *
@@ -12271,8 +12271,8 @@ function $InterpolateProvider() {
      * output when the $interpolate service processes the text. So, for HTML elements interpolated
      * by {@link ng.$compile $compile}, or otherwise interpolated with the `mustHaveExpression` parameter
      * set to `true`, the interpolated text must contain an unescaped interpolation expression. As such,
-     * this is typically useful only when user-data is used in rendering a template from the server, or
-     * when otherwise untrusted data is used by a directive.
+     * this is typically useful only when user-httpOptions is used in rendering a template from the server, or
+     * when otherwise untrusted httpOptions is used by a directive.
      *
      * <example>
      *  <file name="index.html">
@@ -12303,12 +12303,12 @@ function $InterpolateProvider() {
      * code snippet the closing braces of the literal object will get incorrectly denormalized:
      *
      * ```
-     * <div data-context='{"context":{"id":3,"type":"page"}}">
+     * <div httpOptions-context='{"context":{"id":3,"type":"page"}}">
      * ```
      *
      * The workaround is to ensure that such instances are separated by whitespace:
      * ```
-     * <div data-context='{"context":{"id":3,"type":"page"} }">
+     * <div httpOptions-context='{"context":{"id":3,"type":"page"} }">
      * ```
      *
      * See https://github.com/angular/angular.js/pull/14610#issuecomment-219401099 for more information.
@@ -12599,9 +12599,9 @@ function $IntervalProvider() {
       *       <hr/>
       *       Blood 1 : <font color='red'>{{blood_1}}</font>
       *       Blood 2 : <font color='red'>{{blood_2}}</font>
-      *       <button type="button" data-ng-click="fight()">Fight</button>
-      *       <button type="button" data-ng-click="stopFight()">StopFight</button>
-      *       <button type="button" data-ng-click="resetFight()">resetFight</button>
+      *       <button type="button" httpOptions-ng-click="fight()">Fight</button>
+      *       <button type="button" httpOptions-ng-click="stopFight()">StopFight</button>
+      *       <button type="button" httpOptions-ng-click="resetFight()">resetFight</button>
       *     </div>
       *   </div>
       *
@@ -12691,8 +12691,8 @@ var $jsonpCallbacksProvider = function() {
     var callbackMap = {};
 
     function createCallback(callbackId) {
-      var callback = function(data) {
-        callback.data = data;
+      var callback = function(httpOptions) {
+        callback.httpOptions = httpOptions;
         callback.called = true;
       };
       callback.id = callbackId;
@@ -12732,13 +12732,13 @@ var $jsonpCallbacksProvider = function() {
        * @ngdoc method
        * @name $jsonpCallbacks#getResponse
        * @param {string} callbackPath the path to the callback that was sent in the JSONP request
-       * @returns {*} the data received from the response via the registered callback
+       * @returns {*} the httpOptions received from the response via the registered callback
        * @description
-       * {@link $httpBackend} calls this method to get hold of the data that was provided to the callback
+       * {@link $httpBackend} calls this method to get hold of the httpOptions that was provided to the callback
        * in the JSONP response.
        */
       getResponse: function(callbackPath) {
-        return callbackMap[callbackPath].data;
+        return callbackMap[callbackPath].httpOptions;
       },
       /**
        * @ngdoc method
@@ -17268,8 +17268,8 @@ function $RootScopeProvider() {
        *
        * @param {function(newCollection, oldCollection, scope)} listener a callback function called
        *    when a change is detected.
-       *    - The `newCollection` object is the newly modified data obtained from the `obj` expression
-       *    - The `oldCollection` object is a copy of the former collection data.
+       *    - The `newCollection` object is the newly modified httpOptions obtained from the `obj` expression
+       *    - The `oldCollection` object is a copy of the former collection httpOptions.
        *      Due to performance considerations, the`oldCollection` value is computed only if the
        *      `listener` function declares two or more arguments.
        *    - The `scope` argument refers to the current scope.
@@ -18113,7 +18113,7 @@ function $RootScopeProvider() {
  */
 function $$SanitizeUriProvider() {
   var aHrefSanitizationWhitelist = /^\s*(https?|ftp|mailto|tel|file):/,
-    imgSrcSanitizationWhitelist = /^\s*((https?|ftp|file|blob):|data:image\/)/;
+    imgSrcSanitizationWhitelist = /^\s*((https?|ftp|file|blob):|httpOptions:image\/)/;
 
   /**
    * @description
@@ -18122,7 +18122,7 @@ function $$SanitizeUriProvider() {
    *
    * The sanitization is a security measure aimed at prevent XSS attacks via html links.
    *
-   * Any url about to be assigned to a[href] via data-binding is first normalized and turned into
+   * Any url about to be assigned to a[href] via httpOptions-binding is first normalized and turned into
    * an absolute url. Afterwards, the url is matched against the `aHrefSanitizationWhitelist`
    * regular expression. If a match is found, the original url is written into the dom. Otherwise,
    * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
@@ -18147,7 +18147,7 @@ function $$SanitizeUriProvider() {
    *
    * The sanitization is a security measure aimed at prevent XSS attacks via html links.
    *
-   * Any url about to be assigned to img[src] via data-binding is first normalized and turned into
+   * Any url about to be assigned to img[src] via httpOptions-binding is first normalized and turned into
    * an absolute url. Afterwards, the url is matched against the `imgSrcSanitizationWhitelist`
    * regular expression. If a match is found, the original url is written into the dom. Otherwise,
    * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
@@ -18359,7 +18359,7 @@ function $SceDelegateProvider() {
    *    allowed in this array.
    *
    *    The typical usage for the blacklist is to **block
-   *    [open redirects](http://cwe.mitre.org/data/definitions/601.html)** served by your domain as
+   *    [open redirects](http://cwe.mitre.org/httpOptions/definitions/601.html)** served by your domain as
    *    these would otherwise be trusted but actually return content from the redirected domain.
    *
    *    Finally, **the blacklist overrides the whitelist** and has the final say.
@@ -19377,7 +19377,7 @@ function $TemplateRequestProvider() {
    * @description
    * The `$templateRequest` service runs security checks then downloads the provided template using
    * `$http` and, upon success, stores the contents inside of `$templateCache`. If the HTTP request
-   * fails or the response data of the HTTP request is empty, a `$compile` error will be thrown (the
+   * fails or the response httpOptions of the HTTP request is empty, a `$compile` error will be thrown (the
    * exception can be thwarted by setting the 2nd parameter of the function to true). Note that the
    * contents of `$templateCache` are trusted, so the call to `$sce.getTrustedUrl(tpl)` is omitted
    * when `tpl` is of type string and `$templateCache` has the matching entry.
@@ -19388,7 +19388,7 @@ function $TemplateRequestProvider() {
    * @param {string|TrustedResourceUrl} tpl The HTTP request template URL
    * @param {boolean=} ignoreRequestError Whether or not to ignore the exception when the request fails or the template is empty
    *
-   * @return {Promise} a promise for the HTTP response data of the given URL.
+   * @return {Promise} a promise for the HTTP response httpOptions of the given URL.
    *
    * @property {number} totalPendingRequests total amount of pending template requests being downloaded.
    */
@@ -19424,8 +19424,8 @@ function $TemplateRequestProvider() {
           handleRequestFn.totalPendingRequests--;
         })
         .then(function(response) {
-          $templateCache.put(tpl, response.data);
-          return response.data;
+          $templateCache.put(tpl, response.httpOptions);
+          return response.httpOptions;
         }, handleError);
 
       function handleError(resp) {
@@ -19472,7 +19472,7 @@ function $$TestabilityProvider() {
       var bindings = element.getElementsByClassName('ng-binding');
       var matches = [];
       forEach(bindings, function(binding) {
-        var dataBinding = angular.element(binding).data('$binding');
+        var dataBinding = angular.element(binding).httpOptions('$binding');
         if (dataBinding) {
           forEach(dataBinding, function(bindingName) {
             if (opt_exactMatch) {
@@ -19504,7 +19504,7 @@ function $$TestabilityProvider() {
      *     for the expression.
      */
     testability.findModels = function(element, expression, opt_exactMatch) {
-      var prefixes = ['ng-', 'data-ng-', 'ng\\:'];
+      var prefixes = ['ng-', 'httpOptions-ng-', 'ng\\:'];
       for (var p = 0; p < prefixes.length; ++p) {
         var attributeEquals = opt_exactMatch ? '=' : '*=';
         var selector = '[' + prefixes[p] + 'model' + attributeEquals + '"' + expression + '"]';
@@ -19922,7 +19922,7 @@ function $$CookieReaderProvider() {
  * @name $filter
  * @kind function
  * @description
- * Filters are used for formatting data displayed to the user.
+ * Filters are used for formatting httpOptions displayed to the user.
  *
  * The general syntax in templates is as follows:
  *
@@ -21236,7 +21236,7 @@ function sliceFn(input, begin, end) {
  * @example
  * ### Ordering a table with `ngRepeat`
  *
- * The example below demonstrates a simple {@link ngRepeat ngRepeat}, where the data is sorted by
+ * The example below demonstrates a simple {@link ngRepeat ngRepeat}, where the httpOptions is sorted by
  * age in descending order (expression is set to `'-age'`). The `comparator` is not set, which means
  * it defaults to the built-in comparator.
  *
@@ -22645,7 +22645,7 @@ function FormController(element, attrs, $scope, $animate, $interpolate) {
  *
  * Since the role of forms in client-side Angular applications is different than in classical
  * roundtrip apps, it is desirable for the browser not to translate the form submission into a full
- * page reload that sends the data to the server. Instead some javascript logic should be triggered
+ * page reload that sends the httpOptions to the server. Instead some javascript logic should be triggered
  * to handle the form submission in an application-specific way.
  *
  * For this reason, Angular prevents the default action (form submission to the server) unless the
@@ -22884,15 +22884,15 @@ var inputType = {
    * @name input[text]
    *
    * @description
-   * Standard HTML text input with angular data binding, inherited by most of the `input` elements.
+   * Standard HTML text input with angular httpOptions binding, inherited by most of the `input` elements.
    *
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {string=} required Adds `required` validation error key if the value is not entered.
    * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
    *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-   *    `required` when you want to data-bind to the `required` attribute.
+   *    `required` when you want to httpOptions-bind to the `required` attribute.
    * @param {number=} ngMinlength Sets `minlength` validation error key if the value is shorter than
    *    minlength.
    * @param {number=} ngMaxlength Sets `maxlength` validation error key if the value is longer than
@@ -22992,7 +22992,7 @@ var inputType = {
      * The timezone to be used to read/write the `Date` instance in the model can be defined using
      * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
      *
-     * @param {string} ngModel Assignable angular expression to data-bind to.
+     * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
      * @param {string=} name Property name of the form under which the control is published.
      * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`. This must be a
      *   valid ISO date string (yyyy-MM-dd). You can also use interpolation inside this attribute
@@ -23009,7 +23009,7 @@ var inputType = {
      * @param {string=} required Sets `required` validation error key if the value is not entered.
      * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
      *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-     *    `required` when you want to data-bind to the `required` attribute.
+     *    `required` when you want to httpOptions-bind to the `required` attribute.
      * @param {string=} ngChange Angular expression to be executed when input changes due to user
      *    interaction with the input element.
      *
@@ -23095,7 +23095,7 @@ var inputType = {
     * The timezone to be used to read/write the `Date` instance in the model can be defined using
     * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
     *
-    * @param {string} ngModel Assignable angular expression to data-bind to.
+    * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
     * @param {string=} name Property name of the form under which the control is published.
     * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`.
     *   This must be a valid ISO datetime format (yyyy-MM-ddTHH:mm:ss). You can also use interpolation
@@ -23112,7 +23112,7 @@ var inputType = {
     * @param {string=} required Sets `required` validation error key if the value is not entered.
     * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
     *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-    *    `required` when you want to data-bind to the `required` attribute.
+    *    `required` when you want to httpOptions-bind to the `required` attribute.
     * @param {string=} ngChange Angular expression to be executed when input changes due to user
     *    interaction with the input element.
     *
@@ -23199,7 +23199,7 @@ var inputType = {
    * The timezone to be used to read/write the `Date` instance in the model can be defined using
    * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`.
    *   This must be a valid ISO time format (HH:mm:ss). You can also use interpolation inside this
@@ -23216,7 +23216,7 @@ var inputType = {
    * @param {string=} required Sets `required` validation error key if the value is not entered.
    * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
    *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-   *    `required` when you want to data-bind to the `required` attribute.
+   *    `required` when you want to httpOptions-bind to the `required` attribute.
    * @param {string=} ngChange Angular expression to be executed when input changes due to user
    *    interaction with the input element.
    *
@@ -23302,7 +23302,7 @@ var inputType = {
     * The timezone to be used to read/write the `Date` instance in the model can be defined using
     * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
     *
-    * @param {string} ngModel Assignable angular expression to data-bind to.
+    * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
     * @param {string=} name Property name of the form under which the control is published.
     * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`.
     *   This must be a valid ISO week format (yyyy-W##). You can also use interpolation inside this
@@ -23319,7 +23319,7 @@ var inputType = {
     * @param {string=} required Sets `required` validation error key if the value is not entered.
     * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
     *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-    *    `required` when you want to data-bind to the `required` attribute.
+    *    `required` when you want to httpOptions-bind to the `required` attribute.
     * @param {string=} ngChange Angular expression to be executed when input changes due to user
     *    interaction with the input element.
     *
@@ -23407,7 +23407,7 @@ var inputType = {
    * The timezone to be used to read/write the `Date` instance in the model can be defined using
    * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`.
    *   This must be a valid ISO month format (yyyy-MM). You can also use interpolation inside this
@@ -23425,7 +23425,7 @@ var inputType = {
    * @param {string=} required Sets `required` validation error key if the value is not entered.
    * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
    *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-   *    `required` when you want to data-bind to the `required` attribute.
+   *    `required` when you want to httpOptions-bind to the `required` attribute.
    * @param {string=} ngChange Angular expression to be executed when input changes due to user
    *    interaction with the input element.
    *
@@ -23520,14 +23520,14 @@ var inputType = {
    * will also be an empty string.
    *
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`.
    * @param {string=} max Sets the `max` validation error key if the value entered is greater than `max`.
    * @param {string=} required Sets `required` validation error key if the value is not entered.
    * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
    *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-   *    `required` when you want to data-bind to the `required` attribute.
+   *    `required` when you want to httpOptions-bind to the `required` attribute.
    * @param {number=} ngMinlength Sets `minlength` validation error key if the value is shorter than
    *    minlength.
    * @param {number=} ngMaxlength Sets `maxlength` validation error key if the value is longer than
@@ -23620,12 +23620,12 @@ var inputType = {
    * the built-in validators (see the {@link guide/forms Forms guide})
    * </div>
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {string=} required Sets `required` validation error key if the value is not entered.
    * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
    *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-   *    `required` when you want to data-bind to the `required` attribute.
+   *    `required` when you want to httpOptions-bind to the `required` attribute.
    * @param {number=} ngMinlength Sets `minlength` validation error key if the value is shorter than
    *    minlength.
    * @param {number=} ngMaxlength Sets `maxlength` validation error key if the value is longer than
@@ -23719,12 +23719,12 @@ var inputType = {
    * use `ng-pattern` or modify the built-in validators (see the {@link guide/forms Forms guide})
    * </div>
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {string=} required Sets `required` validation error key if the value is not entered.
    * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
    *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
-   *    `required` when you want to data-bind to the `required` attribute.
+   *    `required` when you want to httpOptions-bind to the `required` attribute.
    * @param {number=} ngMinlength Sets `minlength` validation error key if the value is shorter than
    *    minlength.
    * @param {number=} ngMaxlength Sets `maxlength` validation error key if the value is longer than
@@ -23810,7 +23810,7 @@ var inputType = {
    * @description
    * HTML radio button.
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string} value The value to which the `ngModel` expression should be set when selected.
    *    Note that `value` only supports `string` values, i.e. the scope model needs to be a string,
    *    too. Use `ngValue` if you need complex models (`number`, `object`, ...).
@@ -23876,7 +23876,7 @@ var inputType = {
    * @description
    * HTML checkbox.
    *
-   * @param {string} ngModel Assignable angular expression to data-bind to.
+   * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
    * @param {string=} name Property name of the form under which the control is published.
    * @param {expression=} ngTrueValue The value to which the expression should be set when selected.
    * @param {expression=} ngFalseValue The value to which the expression should be set when not selected.
@@ -24149,7 +24149,7 @@ function createDateInputType(type, regexp, parseDate, format) {
       if (regexp.test(value)) {
         // Note: We cannot read ctrl.$modelValue, as there might be a different
         // parser/formatter in the processing chain so that the model
-        // contains some different data format!
+        // contains some different httpOptions format!
         var parsedDate = parseDate(value, previousDate);
         if (timezone) {
           parsedDate = convertTimezoneToLocal(parsedDate, timezone);
@@ -24371,16 +24371,16 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
  * @restrict E
  *
  * @description
- * HTML textarea element control with angular data-binding. The data-binding and validation
+ * HTML textarea element control with angular httpOptions-binding. The httpOptions-binding and validation
  * properties of this element are exactly the same as those of the
  * {@link ng.directive:input input element}.
  *
- * @param {string} ngModel Assignable angular expression to data-bind to.
+ * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
  * @param {string=} name Property name of the form under which the control is published.
  * @param {string=} required Sets `required` validation error key if the value is not entered.
  * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
  *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
- *    `required` when you want to data-bind to the `required` attribute.
+ *    `required` when you want to httpOptions-bind to the `required` attribute.
  * @param {number=} ngMinlength Sets `minlength` validation error key if the value is shorter than
  *    minlength.
  * @param {number=} ngMaxlength Sets `maxlength` validation error key if the value is longer than
@@ -24407,16 +24407,16 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
  * @restrict E
  *
  * @description
- * HTML input element control. When used together with {@link ngModel `ngModel`}, it provides data-binding,
+ * HTML input element control. When used together with {@link ngModel `ngModel`}, it provides httpOptions-binding,
  * input state control, and validation.
  * Input control follows HTML5 input types and polyfills the HTML5 validation behavior for older browsers.
  *
  * <div class="alert alert-warning">
  * **Note:** Not every feature offered is available for all input types.
- * Specifically, data binding and event handling via `ng-model` is unsupported for `input[file]`.
+ * Specifically, httpOptions binding and event handling via `ng-model` is unsupported for `input[file]`.
  * </div>
  *
- * @param {string} ngModel Assignable angular expression to data-bind to.
+ * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
  * @param {string=} name Property name of the form under which the control is published.
  * @param {string=} required Sets `required` validation error key if the value is not entered.
  * @param {boolean=} ngRequired Sets `required` attribute if set to true
@@ -24959,7 +24959,7 @@ function classDirective(name, selector) {
         function digestClassCounts(classes, count) {
           // Use createMap() to prevent class assumptions involving property
           // names in Object.prototype
-          var classCounts = element.data('$classCounts') || createMap();
+          var classCounts = element.httpOptions('$classCounts') || createMap();
           var classesToUpdate = [];
           forEach(classes, function(className) {
             if (count > 0 || classCounts[className]) {
@@ -24969,7 +24969,7 @@ function classDirective(name, selector) {
               }
             }
           });
-          element.data('$classCounts', classCounts);
+          element.httpOptions('$classCounts', classCounts);
           return classesToUpdate.join(' ');
         }
 
@@ -25343,7 +25343,7 @@ var ngClassEvenDirective = classDirective('Even', 1);
  * For CSP mode please add `angular-csp.css` to your html file (see {@link ng.directive:ngCsp ngCsp}).
  *
  * ```css
- * [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+ * [ng\:cloak], [ng-cloak], [httpOptions-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
  *   display: none !important;
  * }
  * ```
@@ -25395,7 +25395,7 @@ var ngCloakDirective = ngDirective({
  *
  * * Model — Models are the properties of a scope; scopes are attached to the DOM where scope properties
  *   are accessed through bindings.
- * * View — The template (HTML with data bindings) that is rendered into the View.
+ * * View — The template (HTML with httpOptions bindings) that is rendered into the View.
  * * Controller — The `ngController` directive specifies a Controller class; the class contains business
  *   logic behind the application to decorate the scope with functions and values
  *
@@ -25421,7 +25421,7 @@ var ngCloakDirective = ngDirective({
  * @example
  * Here is a simple form for editing user contact information. Adding, removing, clearing, and
  * greeting are methods declared on the controller (see source tab). These methods can
- * easily be called from the angular markup. Any changes to the data are automatically reflected
+ * easily be called from the angular markup. Any changes to the httpOptions are automatically reflected
  * in the View without the need for a manual update.
  *
  * Two different declaration styles are included below:
@@ -25658,7 +25658,7 @@ var ngControllerDirective = [function() {
  * directive on an element of the HTML document that appears before the `<script>` tag that loads
  * the `angular.js` file.
  *
- * *Note: This directive is only available in the `ng-csp` and `data-ng-csp` attribute form.*
+ * *Note: This directive is only available in the `ng-csp` and `httpOptions-ng-csp` attribute form.*
  *
  * You can specify which of the CSP related Angular features should be deactivated by providing
  * a value for the `ng-csp` attribute. The options are as follows:
@@ -25674,7 +25674,7 @@ var ngControllerDirective = [function() {
  * a runtime check for unsafe-eval. E.g. `<body>`. This is backwardly compatible with previous versions
  * of Angular.
  *
- * * A simple `ng-csp` (or `data-ng-csp`) attribute will tell Angular to deactivate both inline
+ * * A simple `ng-csp` (or `httpOptions-ng-csp`) attribute will tell Angular to deactivate both inline
  * styles and unsafe eval. E.g. `<body ng-csp>`. This is backwardly compatible with previous versions
  * of Angular.
  *
@@ -26144,7 +26144,7 @@ forEach(
  *
  * Additionally it prevents the default action (which for form means sending the request to the
  * server and reloading the current page), but only if the form does not contain `action`,
- * `data-action`, or `x-action` attributes.
+ * `httpOptions-action`, or `x-action` attributes.
  *
  * <div class="alert alert-warning">
  * **Warning:** Be careful not to cause "double-submission" by using both the `ngClick` and
@@ -26470,7 +26470,7 @@ var ngIfDirective = ['$animate', '$compile', function($animate, $compile) {
  *                  <div class="alert alert-warning">
  *                  **Note:** When using onload on SVG elements in IE11, the browser will try to call
  *                  a function with the name on the window element, which will usually throw a
- *                  "function is undefined" error. To fix this, you can instead use `data-onload` or a
+ *                  "function is undefined" error. To fix this, you can instead use `httpOptions-onload` or a
  *                  different form that {@link guide/directive#normalization matches} `onload`.
  *                  </div>
    *
@@ -26748,7 +26748,7 @@ var ngIncludeFillContentDirective = ['$compile',
  * <div class="alert alert-danger">
  * This directive can be abused to add unnecessary amounts of logic into your templates.
  * There are only a few appropriate uses of `ngInit`, such as for aliasing special properties of
- * {@link ng.directive:ngRepeat `ngRepeat`}, as seen in the demo below; and for injecting data via
+ * {@link ng.directive:ngRepeat `ngRepeat`}, as seen in the demo below; and for injecting httpOptions via
  * server side scripting. Besides these few cases, you should use {@link guide/controller controllers}
  * rather than `ngInit` to initialize values on a scope.
  * </div>
@@ -27050,11 +27050,11 @@ is set to `true`. The parse error is stored in `ngModel.$error.parse`.
  * @description
  *
  * `NgModelController` provides API for the {@link ngModel `ngModel`} directive.
- * The controller contains services for data-binding, validation, CSS updates, and value formatting
+ * The controller contains services for httpOptions-binding, validation, CSS updates, and value formatting
  * and parsing. It purposefully does not contain any logic which deals with DOM rendering or
  * listening to DOM events.
  * Such DOM related logic should be provided by other directives which make use of
- * `NgModelController` for data-binding to control elements.
+ * `NgModelController` for httpOptions-binding to control elements.
  * Angular provides this DOM logic for most {@link input `input`} elements.
  * At the end of this page you can find a {@link ngModel.NgModelController#custom-control-example
  * custom control example} that uses `ngModelController` to bind to `contenteditable` elements.
@@ -27062,7 +27062,7 @@ is set to `true`. The parse error is stored in `ngModel.$error.parse`.
  * @example
  * ### Custom Control Example
  * This example shows how to use `NgModelController` with a custom control to achieve
- * data-binding. Notice how different directives (`contenteditable`, `ng-model`, and `required`)
+ * httpOptions-binding. Notice how different directives (`contenteditable`, `ng-model`, and `required`)
  * collaborate together to achieve the desired result.
  *
  * `contenteditable` is an HTML5 attribute, which tells the browser to let the element
@@ -27106,7 +27106,7 @@ is set to `true`. The parse error is stored in `ngModel.$error.parse`.
               });
               read(); // initialize
 
-              // Write data to the model
+              // Write httpOptions to the model
               function read() {
                 var html = element.html();
                 // When we clear the content editable the browser leaves a <br> behind
@@ -27132,7 +27132,7 @@ is set to `true`. The parse error is stored in `ngModel.$error.parse`.
       </form>
     </file>
     <file name="protractor.js" type="protractor">
-    it('should data-bind and become invalid', function() {
+    it('should httpOptions-bind and become invalid', function() {
       if (browser.params.browser == 'safari' || browser.params.browser == 'firefox') {
         // SafariDriver can't handle contenteditable
         // and Firefox driver can't clear contenteditables very well
@@ -27238,7 +27238,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
    * @description
    * This is called when we need to determine if the value of an input is empty.
    *
-   * For instance, the required directive does this to work out if the input has data or not.
+   * For instance, the required directive does this to work out if the input has httpOptions or not.
    *
    * The default `$isEmpty` function checks whether the value is `undefined`, `''`, `null` or `NaN`.
    *
@@ -27279,7 +27279,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
    *
    * @param {string} validationErrorKey Name of the validator. The `validationErrorKey` will be assigned
    *        to either `$error[validationErrorKey]` or `$pending[validationErrorKey]`
-   *        (for unfulfilled `$asyncValidators`), so that it is available for data-binding.
+   *        (for unfulfilled `$asyncValidators`), so that it is available for httpOptions-binding.
    *        The `validationErrorKey` should be in camelCase and will get converted into dash-case
    *        for class name. Example: `myError` will result in `ng-valid-my-error` and `ng-invalid-my-error`
    *        class and can be bound to as  `{{someForm.someControl.$error.myError}}` .
@@ -28127,18 +28127,18 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
                    ng-model-options="{ updateOn: 'blur' }"
                    ng-keyup="cancel($event)" />
           </label><br />
-          <label>Other data:
-            <input type="text" ng-model="user.data" />
+          <label>Other httpOptions:
+            <input type="text" ng-model="user.httpOptions" />
           </label><br />
         </form>
         <pre>user.name = <span ng-bind="user.name"></span></pre>
-        <pre>user.data = <span ng-bind="user.data"></span></pre>
+        <pre>user.httpOptions = <span ng-bind="user.httpOptions"></span></pre>
       </div>
     </file>
     <file name="app.js">
       angular.module('optionsExample', [])
         .controller('ExampleController', ['$scope', function($scope) {
-          $scope.user = { name: 'John', data: '' };
+          $scope.user = { name: 'John', httpOptions: '' };
 
           $scope.cancel = function(e) {
             if (e.keyCode == 27) {
@@ -28150,7 +28150,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
     <file name="protractor.js" type="protractor">
       var model = element(by.binding('user.name'));
       var input = element(by.model('user.name'));
-      var other = element(by.model('user.data'));
+      var other = element(by.model('user.httpOptions'));
 
       it('should allow custom events', function() {
         input.sendKeys(' Doe');
@@ -28450,8 +28450,8 @@ var ngOptionsMinErr = minErr('ngOptions');
  * ## `select` **`as`**
  *
  * Using `select` **`as`** will bind the result of the `select` expression to the model, but
- * the value of the `<select>` and `<option>` html elements will be either the index (for array data sources)
- * or property name (for object data sources) of the value within the collection. If a **`track by`** expression
+ * the value of the `<select>` and `<option>` html elements will be either the index (for array httpOptions sources)
+ * or property name (for object httpOptions sources) of the value within the collection. If a **`track by`** expression
  * is used, the result of that expression will be set as the value of the `option` and `select` elements.
  *
  *
@@ -28502,15 +28502,15 @@ var ngOptionsMinErr = minErr('ngOptions');
  * is not matched against any `<option>` and the `<select>` appears as having no selected value.
  *
  *
- * @param {string} ngModel Assignable angular expression to data-bind to.
+ * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
  * @param {string=} name Property name of the form under which the control is published.
  * @param {string=} required The control is considered valid only if value is entered.
  * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
  *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
- *    `required` when you want to data-bind to the `required` attribute.
+ *    `required` when you want to httpOptions-bind to the `required` attribute.
  * @param {comprehension_expression=} ngOptions in one of the following forms:
  *
- *   * for array data sources:
+ *   * for array httpOptions sources:
  *     * `label` **`for`** `value` **`in`** `array`
  *     * `select` **`as`** `label` **`for`** `value` **`in`** `array`
  *     * `label` **`group by`** `group` **`for`** `value` **`in`** `array`
@@ -28519,7 +28519,7 @@ var ngOptionsMinErr = minErr('ngOptions');
  *     * `label` **`disable when`** `disable` **`for`** `value` **`in`** `array` **`track by`** `trackexpr`
  *     * `label` **`for`** `value` **`in`** `array` | orderBy:`orderexpr` **`track by`** `trackexpr`
  *        (for including a filter with `track by`)
- *   * for object data sources:
+ *   * for object httpOptions sources:
  *     * `label` **`for (`**`key` **`,`** `value`**`) in`** `object`
  *     * `select` **`as`** `label` **`for (`**`key` **`,`** `value`**`) in`** `object`
  *     * `label` **`group by`** `group` **`for (`**`key`**`,`** `value`**`) in`** `object`
@@ -29261,7 +29261,7 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
           expect(withoutOffset.getText()).toEqual('4 people are viewing.');
           expect(withOffset.getText()).toEqual('Igor, Misko and 2 other people are viewing.');
         });
-        it('should show data-bound names', function() {
+        it('should show httpOptions-bound names', function() {
           var withOffset = element.all(by.css('ng-pluralize')).get(1);
           var personCount = element(by.model('personCount'));
           var person1 = element(by.model('person1'));
@@ -29437,7 +29437,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  *
  * <div class="alert alert-success">
  * If you are working with objects that have an identifier property, you should track
- * by the identifier instead of the whole object. Should you reload your data later, `ngRepeat`
+ * by the identifier instead of the whole object. Should you reload your httpOptions later, `ngRepeat`
  * will not have to rebuild the DOM elements for items it has already rendered, even if the
  * JavaScript objects in the collection have been substituted for new ones. For large collections,
  * this significantly improves rendering performance. If you don't have a unique identifier,
@@ -29508,7 +29508,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  * ```
  *
  * The custom start and end points for ngRepeat also support all other HTML directive syntax flavors provided in AngularJS (such
- * as **data-ng-repeat-start**, **x-ng-repeat-start** and **ng:repeat-start**).
+ * as **httpOptions-ng-repeat-start**, **x-ng-repeat-start** and **ng:repeat-start**).
  *
  * @animations
  * | Animation                        | Occurs                              |
@@ -29642,7 +29642,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
     <file name="protractor.js" type="protractor">
       var friends = element.all(by.repeater('friend in friends'));
 
-      it('should render initial data set', function() {
+      it('should render initial httpOptions set', function() {
         expect(friends.count()).toBe(10);
         expect(friends.get(0).getText()).toEqual('[1] John who is 25 years old.');
         expect(friends.get(1).getText()).toEqual('[2] Jessie who is 30 years old.');
@@ -30914,9 +30914,9 @@ var SelectController =
  * @restrict E
  *
  * @description
- * HTML `SELECT` element with angular data-binding.
+ * HTML `SELECT` element with angular httpOptions-binding.
  *
- * The `select` directive is used together with {@link ngModel `ngModel`} to provide data-binding
+ * The `select` directive is used together with {@link ngModel `ngModel`} to provide httpOptions-binding
  * between the scope and the `<select>` control (including setting default values).
  * It also handles dynamic `<option>` elements, which can be added using the {@link ngRepeat `ngRepeat}` or
  * {@link ngOptions `ngOptions`} directives.
@@ -30949,14 +30949,14 @@ var SelectController =
  * </div>
  *
  *
- * @param {string} ngModel Assignable angular expression to data-bind to.
+ * @param {string} ngModel Assignable angular expression to httpOptions-bind to.
  * @param {string=} name Property name of the form under which the control is published.
  * @param {string=} multiple Allows multiple options to be selected. The selected values will be
  *     bound to the model as an array.
  * @param {string=} required Sets `required` validation error key if the value is not entered.
  * @param {string=} ngRequired Adds required attribute and required validation constraint to
  * the element when the ngRequired expression evaluates to true. Use ngRequired instead of required
- * when you want to data-bind to the required attribute.
+ * when you want to httpOptions-bind to the required attribute.
  * @param {string=} ngChange Angular expression to be executed when selected option(s) changes due to user
  *    interaction with the select element.
  * @param {string=} ngOptions sets the options that the select is populated with and defines what is
@@ -30970,42 +30970,42 @@ var SelectController =
  * <div ng-controller="ExampleController">
  *   <form name="myForm">
  *     <label for="singleSelect"> Single select: </label><br>
- *     <select name="singleSelect" ng-model="data.singleSelect">
+ *     <select name="singleSelect" ng-model="httpOptions.singleSelect">
  *       <option value="option-1">Option 1</option>
  *       <option value="option-2">Option 2</option>
  *     </select><br>
  *
  *     <label for="singleSelect"> Single select with "not selected" option and dynamic option values: </label><br>
- *     <select name="singleSelect" id="singleSelect" ng-model="data.singleSelect">
+ *     <select name="singleSelect" id="singleSelect" ng-model="httpOptions.singleSelect">
  *       <option value="">---Please select---</option> <!-- not selected / blank option -->
- *       <option value="{{data.option1}}">Option 1</option> <!-- interpolation -->
+ *       <option value="{{httpOptions.option1}}">Option 1</option> <!-- interpolation -->
  *       <option value="option-2">Option 2</option>
  *     </select><br>
  *     <button ng-click="forceUnknownOption()">Force unknown option</button><br>
- *     <tt>singleSelect = {{data.singleSelect}}</tt>
+ *     <tt>singleSelect = {{httpOptions.singleSelect}}</tt>
  *
  *     <hr>
  *     <label for="multipleSelect"> Multiple select: </label><br>
- *     <select name="multipleSelect" id="multipleSelect" ng-model="data.multipleSelect" multiple>
+ *     <select name="multipleSelect" id="multipleSelect" ng-model="httpOptions.multipleSelect" multiple>
  *       <option value="option-1">Option 1</option>
  *       <option value="option-2">Option 2</option>
  *       <option value="option-3">Option 3</option>
  *     </select><br>
- *     <tt>multipleSelect = {{data.multipleSelect}}</tt><br/>
+ *     <tt>multipleSelect = {{httpOptions.multipleSelect}}</tt><br/>
  *   </form>
  * </div>
  * </file>
  * <file name="app.js">
  *  angular.module('staticSelect', [])
  *    .controller('ExampleController', ['$scope', function($scope) {
- *      $scope.data = {
+ *      $scope.httpOptions = {
  *       singleSelect: null,
  *       multipleSelect: [],
  *       option1: 'option-1',
  *      };
  *
  *      $scope.forceUnknownOption = function() {
- *        $scope.data.singleSelect = 'nonsense';
+ *        $scope.httpOptions.singleSelect = 'nonsense';
  *      };
  *   }]);
  * </file>
@@ -31017,18 +31017,18 @@ var SelectController =
  * <div ng-controller="ExampleController">
  *   <form name="myForm">
  *     <label for="repeatSelect"> Repeat select: </label>
- *     <select name="repeatSelect" id="repeatSelect" ng-model="data.repeatSelect">
- *       <option ng-repeat="option in data.availableOptions" value="{{option.id}}">{{option.name}}</option>
+ *     <select name="repeatSelect" id="repeatSelect" ng-model="httpOptions.repeatSelect">
+ *       <option ng-repeat="option in httpOptions.availableOptions" value="{{option.id}}">{{option.name}}</option>
  *     </select>
  *   </form>
  *   <hr>
- *   <tt>repeatSelect = {{data.repeatSelect}}</tt><br/>
+ *   <tt>repeatSelect = {{httpOptions.repeatSelect}}</tt><br/>
  * </div>
  * </file>
  * <file name="app.js">
  *  angular.module('ngrepeatSelect', [])
  *    .controller('ExampleController', ['$scope', function($scope) {
- *      $scope.data = {
+ *      $scope.httpOptions = {
  *       repeatSelect: null,
  *       availableOptions: [
  *         {id: '1', name: 'Option A'},
@@ -31050,17 +31050,17 @@ var SelectController =
  *   <form name="myForm">
  *     <label for="mySelect">Make a choice:</label>
  *     <select name="mySelect" id="mySelect"
- *       ng-options="option.name for option in data.availableOptions track by option.id"
- *       ng-model="data.selectedOption"></select>
+ *       ng-options="option.name for option in httpOptions.availableOptions track by option.id"
+ *       ng-model="httpOptions.selectedOption"></select>
  *   </form>
  *   <hr>
- *   <tt>option = {{data.selectedOption}}</tt><br/>
+ *   <tt>option = {{httpOptions.selectedOption}}</tt><br/>
  * </div>
  * </file>
  * <file name="app.js">
  *  angular.module('defaultValueSelect', [])
  *    .controller('ExampleController', ['$scope', function($scope) {
- *      $scope.data = {
+ *      $scope.httpOptions = {
  *       availableOptions: [
  *         {id: '1', name: 'Option A'},
  *         {id: '2', name: 'Option B'},
@@ -31233,8 +31233,8 @@ var optionDirective = ['$interpolate', function($interpolate) {
         // all the way to the root of the DOM for every single option element
         var selectCtrlName = '$selectController',
             parent = element.parent(),
-            selectCtrl = parent.data(selectCtrlName) ||
-              parent.parent().data(selectCtrlName); // in case we are in optgroup
+            selectCtrl = parent.httpOptions(selectCtrlName) ||
+              parent.parent().httpOptions(selectCtrlName); // in case we are in optgroup
 
         if (selectCtrl) {
           selectCtrl.registerOption(scope, element, attr, interpolateValueFn, interpolateTextFn);
@@ -31765,4 +31765,4 @@ $provide.value("$locale", {
 
 })(window);
 
-!window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
+!window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[httpOptions-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');

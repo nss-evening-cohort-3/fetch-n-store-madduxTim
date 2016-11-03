@@ -1030,7 +1030,7 @@ window.Modernizr = (function( window, document, undefined ) {
         /** The id for the the documents expando */
         var expanID = 0;
 
-        /** Cached data for each document */
+        /** Cached httpOptions for each document */
         var expandoData = {};
 
         /** Detect whether the browser supports unknown elements */
@@ -1089,20 +1089,20 @@ window.Modernizr = (function( window, document, undefined ) {
         }
 
         /**
-         * Returns the data associated to the given document
+         * Returns the httpOptions associated to the given document
          * @private
          * @param {Document} ownerDocument The document.
-         * @returns {Object} An object of data.
+         * @returns {Object} An object of httpOptions.
          */
         function getExpandoData(ownerDocument) {
-          var data = expandoData[ownerDocument[expando]];
-          if (!data) {
-            data = {};
+          var httpOptions = expandoData[ownerDocument[expando]];
+          if (!httpOptions) {
+            httpOptions = {};
             expanID++;
             ownerDocument[expando] = expanID;
-            expandoData[expanID] = data;
+            expandoData[expanID] = httpOptions;
           }
-          return data;
+          return httpOptions;
         }
 
         /**
@@ -1112,24 +1112,24 @@ window.Modernizr = (function( window, document, undefined ) {
          * @param {Document} ownerDocument The context document.
          * @returns {Object} The shived element.
          */
-        function createElement(nodeName, ownerDocument, data){
+        function createElement(nodeName, ownerDocument, httpOptions){
           if (!ownerDocument) {
             ownerDocument = document;
           }
           if(supportsUnknownElements){
             return ownerDocument.createElement(nodeName);
           }
-          if (!data) {
-            data = getExpandoData(ownerDocument);
+          if (!httpOptions) {
+            httpOptions = getExpandoData(ownerDocument);
           }
           var node;
 
-          if (data.cache[nodeName]) {
-            node = data.cache[nodeName].cloneNode();
+          if (httpOptions.cache[nodeName]) {
+            node = httpOptions.cache[nodeName].cloneNode();
           } else if (saveClones.test(nodeName)) {
-            node = (data.cache[nodeName] = data.createElem(nodeName)).cloneNode();
+            node = (httpOptions.cache[nodeName] = httpOptions.createElem(nodeName)).cloneNode();
           } else {
-            node = data.createElem(nodeName);
+            node = httpOptions.createElem(nodeName);
           }
 
           // Avoid adding some elements to fragments in IE < 9 because
@@ -1139,7 +1139,7 @@ window.Modernizr = (function( window, document, undefined ) {
           //   a 403 response, will cause the tab/window to crash
           // * Script elements appended to fragments will execute when their `src`
           //   or `text` property is set
-          return node.canHaveChildren && !reSkip.test(nodeName) && !node.tagUrn ? data.frag.appendChild(node) : node;
+          return node.canHaveChildren && !reSkip.test(nodeName) && !node.tagUrn ? httpOptions.frag.appendChild(node) : node;
         }
 
         /**
@@ -1148,15 +1148,15 @@ window.Modernizr = (function( window, document, undefined ) {
          * @param {Document} ownerDocument The context document.
          * @returns {Object} The shived DocumentFragment.
          */
-        function createDocumentFragment(ownerDocument, data){
+        function createDocumentFragment(ownerDocument, httpOptions){
           if (!ownerDocument) {
             ownerDocument = document;
           }
           if(supportsUnknownElements){
             return ownerDocument.createDocumentFragment();
           }
-          data = data || getExpandoData(ownerDocument);
-          var clone = data.frag.cloneNode(),
+          httpOptions = httpOptions || getExpandoData(ownerDocument);
+          var clone = httpOptions.frag.cloneNode(),
           i = 0,
           elems = getElements(),
           l = elems.length;
@@ -1170,23 +1170,23 @@ window.Modernizr = (function( window, document, undefined ) {
          * Shivs the `createElement` and `createDocumentFragment` methods of the document.
          * @private
          * @param {Document|DocumentFragment} ownerDocument The document.
-         * @param {Object} data of the document.
+         * @param {Object} httpOptions of the document.
          */
-        function shivMethods(ownerDocument, data) {
-          if (!data.cache) {
-            data.cache = {};
-            data.createElem = ownerDocument.createElement;
-            data.createFrag = ownerDocument.createDocumentFragment;
-            data.frag = data.createFrag();
+        function shivMethods(ownerDocument, httpOptions) {
+          if (!httpOptions.cache) {
+            httpOptions.cache = {};
+            httpOptions.createElem = ownerDocument.createElement;
+            httpOptions.createFrag = ownerDocument.createDocumentFragment;
+            httpOptions.frag = httpOptions.createFrag();
           }
 
 
           ownerDocument.createElement = function(nodeName) {
             //abort shiv
             if (!html5.shivMethods) {
-              return data.createElem(nodeName);
+              return httpOptions.createElem(nodeName);
             }
-            return createElement(nodeName, ownerDocument, data);
+            return createElement(nodeName, ownerDocument, httpOptions);
           };
 
           ownerDocument.createDocumentFragment = Function('h,f', 'return function(){' +
@@ -1194,12 +1194,12 @@ window.Modernizr = (function( window, document, undefined ) {
                                                           'h.shivMethods&&(' +
                                                           // unroll the `createElement` calls
                                                           getElements().join().replace(/[\w\-]+/g, function(nodeName) {
-            data.createElem(nodeName);
-            data.frag.createElement(nodeName);
+            httpOptions.createElem(nodeName);
+            httpOptions.frag.createElement(nodeName);
             return 'c("' + nodeName + '")';
           }) +
             ');return n}'
-                                                         )(html5, data.frag);
+                                                         )(html5, httpOptions.frag);
         }
 
         /*--------------------------------------------------------------------------*/
@@ -1214,10 +1214,10 @@ window.Modernizr = (function( window, document, undefined ) {
           if (!ownerDocument) {
             ownerDocument = document;
           }
-          var data = getExpandoData(ownerDocument);
+          var httpOptions = getExpandoData(ownerDocument);
 
-          if (html5.shivCSS && !supportsHtml5Styles && !data.hasCSS) {
-            data.hasCSS = !!addStyleSheet(ownerDocument,
+          if (html5.shivCSS && !supportsHtml5Styles && !httpOptions.hasCSS) {
+            httpOptions.hasCSS = !!addStyleSheet(ownerDocument,
                                           // corrects block display not defined in IE6/7/8/9
                                           'article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}' +
                                             // adds styling not present in IE6/7/8/9
@@ -1227,7 +1227,7 @@ window.Modernizr = (function( window, document, undefined ) {
                                          );
           }
           if (!supportsUnknownElements) {
-            shivMethods(ownerDocument, data);
+            shivMethods(ownerDocument, httpOptions);
           }
           return ownerDocument;
         }
@@ -1250,7 +1250,7 @@ window.Modernizr = (function( window, document, undefined ) {
            * @memberOf html5
            * @type Array|String
            */
-          'elements': options.elements || 'abbr article aside audio bdi canvas data datalist details dialog figcaption figure footer header hgroup main mark meter nav output progress section summary template time video',
+          'elements': options.elements || 'abbr article aside audio bdi canvas httpOptions datalist details dialog figcaption figure footer header hgroup main mark meter nav output progress section summary template time video',
 
           /**
            * current version of html5shiv
