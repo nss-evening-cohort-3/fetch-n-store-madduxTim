@@ -17,7 +17,7 @@ namespace Fetch_n_Store.Migrations
             //  This method will be called after migrating to the latest version.
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data. E.g.
+            //  to avoid creating duplicate seed httpOptions. E.g.
             //
             //    context.People.AddOrUpdate(
             //      p => p.FullName,

@@ -91,7 +91,7 @@ if (typeof jQuery === 'undefined') {
   // ALERT CLASS DEFINITION
   // ======================
 
-  var dismiss = '[data-dismiss="alert"]'
+  var dismiss = '[httpOptions-dismiss="alert"]'
   var Alert   = function (el) {
     $(el).on('click', dismiss, this.close)
   }
@@ -102,7 +102,7 @@ if (typeof jQuery === 'undefined') {
 
   Alert.prototype.close = function (e) {
     var $this    = $(this)
-    var selector = $this.attr('data-target')
+    var selector = $this.attr('httpOptions-target')
 
     if (!selector) {
       selector = $this.attr('href')
@@ -124,7 +124,7 @@ if (typeof jQuery === 'undefined') {
     $parent.removeClass('in')
 
     function removeElement() {
-      // detach from parent, fire event then clean up data
+      // detach from parent, fire event then clean up httpOptions
       $parent.detach().trigger('closed.bs.alert').remove()
     }
 
@@ -142,10 +142,10 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this = $(this)
-      var data  = $this.data('bs.alert')
+      var httpOptions  = $this.httpOptions('bs.alert')
 
-      if (!data) $this.data('bs.alert', (data = new Alert(this)))
-      if (typeof option == 'string') data[option].call($this)
+      if (!httpOptions) $this.httpOptions('bs.alert', (httpOptions = new Alert(this)))
+      if (typeof option == 'string') httpOptions[option].call($this)
     })
   }
 
@@ -167,7 +167,7 @@ if (typeof jQuery === 'undefined') {
   // ALERT DATA-API
   // ==============
 
-  $(document).on('click.bs.alert.data-api', dismiss, Alert.prototype.close)
+  $(document).on('click.bs.alert.httpOptions-api', dismiss, Alert.prototype.close)
 
 }(jQuery);
 
@@ -202,15 +202,15 @@ if (typeof jQuery === 'undefined') {
     var d    = 'disabled'
     var $el  = this.$element
     var val  = $el.is('input') ? 'val' : 'html'
-    var data = $el.data()
+    var httpOptions = $el.httpOptions()
 
     state += 'Text'
 
-    if (data.resetText == null) $el.data('resetText', $el[val]())
+    if (httpOptions.resetText == null) $el.httpOptions('resetText', $el[val]())
 
     // push to event loop to allow forms to submit
     setTimeout($.proxy(function () {
-      $el[val](data[state] == null ? this.options[state] : data[state])
+      $el[val](httpOptions[state] == null ? this.options[state] : httpOptions[state])
 
       if (state == 'loadingText') {
         this.isLoading = true
@@ -224,7 +224,7 @@ if (typeof jQuery === 'undefined') {
 
   Button.prototype.toggle = function () {
     var changed = true
-    var $parent = this.$element.closest('[data-toggle="buttons"]')
+    var $parent = this.$element.closest('[httpOptions-toggle="buttons"]')
 
     if ($parent.length) {
       var $input = this.$element.find('input')
@@ -251,13 +251,13 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.button')
+      var httpOptions    = $this.httpOptions('bs.button')
       var options = typeof option == 'object' && option
 
-      if (!data) $this.data('bs.button', (data = new Button(this, options)))
+      if (!httpOptions) $this.httpOptions('bs.button', (httpOptions = new Button(this, options)))
 
-      if (option == 'toggle') data.toggle()
-      else if (option) data.setState(option)
+      if (option == 'toggle') httpOptions.toggle()
+      else if (option) httpOptions.setState(option)
     })
   }
 
@@ -280,7 +280,7 @@ if (typeof jQuery === 'undefined') {
   // ===============
 
   $(document)
-    .on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+    .on('click.bs.button.httpOptions-api', '[httpOptions-toggle^="button"]', function (e) {
       var $btn = $(e.target).closest('.btn')
       Plugin.call($btn, 'toggle')
       if (!($(e.target).is('input[type="radio"], input[type="checkbox"]'))) {
@@ -291,7 +291,7 @@ if (typeof jQuery === 'undefined') {
         else $btn.find('input:visible,button:visible').first().trigger('focus')
       }
     })
-    .on('focus.bs.button.data-api blur.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+    .on('focus.bs.button.httpOptions-api blur.bs.button.httpOptions-api', '[httpOptions-toggle^="button"]', function (e) {
       $(e.target).closest('.btn').toggleClass('focus', /^focus(in)?$/.test(e.type))
     })
 
@@ -475,14 +475,14 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.carousel')
-      var options = $.extend({}, Carousel.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var httpOptions    = $this.httpOptions('bs.carousel')
+      var options = $.extend({}, Carousel.DEFAULTS, $this.httpOptions(), typeof option == 'object' && option)
       var action  = typeof option == 'string' ? option : options.slide
 
-      if (!data) $this.data('bs.carousel', (data = new Carousel(this, options)))
-      if (typeof option == 'number') data.to(option)
-      else if (action) data[action]()
-      else if (options.interval) data.pause().cycle()
+      if (!httpOptions) $this.httpOptions('bs.carousel', (httpOptions = new Carousel(this, options)))
+      if (typeof option == 'number') httpOptions.to(option)
+      else if (action) httpOptions[action]()
+      else if (options.interval) httpOptions.pause().cycle()
     })
   }
 
@@ -507,29 +507,29 @@ if (typeof jQuery === 'undefined') {
   var clickHandler = function (e) {
     var href
     var $this   = $(this)
-    var $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) // strip for ie7
+    var $target = $($this.attr('httpOptions-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) // strip for ie7
     if (!$target.hasClass('carousel')) return
-    var options = $.extend({}, $target.data(), $this.data())
-    var slideIndex = $this.attr('data-slide-to')
+    var options = $.extend({}, $target.httpOptions(), $this.httpOptions())
+    var slideIndex = $this.attr('httpOptions-slide-to')
     if (slideIndex) options.interval = false
 
     Plugin.call($target, options)
 
     if (slideIndex) {
-      $target.data('bs.carousel').to(slideIndex)
+      $target.httpOptions('bs.carousel').to(slideIndex)
     }
 
     e.preventDefault()
   }
 
   $(document)
-    .on('click.bs.carousel.data-api', '[data-slide]', clickHandler)
-    .on('click.bs.carousel.data-api', '[data-slide-to]', clickHandler)
+    .on('click.bs.carousel.httpOptions-api', '[httpOptions-slide]', clickHandler)
+    .on('click.bs.carousel.httpOptions-api', '[httpOptions-slide-to]', clickHandler)
 
   $(window).on('load', function () {
-    $('[data-ride="carousel"]').each(function () {
+    $('[httpOptions-ride="carousel"]').each(function () {
       var $carousel = $(this)
-      Plugin.call($carousel, $carousel.data())
+      Plugin.call($carousel, $carousel.httpOptions())
     })
   })
 
@@ -554,8 +554,8 @@ if (typeof jQuery === 'undefined') {
   var Collapse = function (element, options) {
     this.$element      = $(element)
     this.options       = $.extend({}, Collapse.DEFAULTS, options)
-    this.$trigger      = $('[data-toggle="collapse"][href="#' + element.id + '"],' +
-                           '[data-toggle="collapse"][data-target="#' + element.id + '"]')
+    this.$trigger      = $('[httpOptions-toggle="collapse"][href="#' + element.id + '"],' +
+                           '[httpOptions-toggle="collapse"][httpOptions-target="#' + element.id + '"]')
     this.transitioning = null
 
     if (this.options.parent) {
@@ -587,7 +587,7 @@ if (typeof jQuery === 'undefined') {
     var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
 
     if (actives && actives.length) {
-      activesData = actives.data('bs.collapse')
+      activesData = actives.httpOptions('bs.collapse')
       if (activesData && activesData.transitioning) return
     }
 
@@ -597,7 +597,7 @@ if (typeof jQuery === 'undefined') {
 
     if (actives && actives.length) {
       Plugin.call(actives, 'hide')
-      activesData || actives.data('bs.collapse', null)
+      activesData || actives.httpOptions('bs.collapse', null)
     }
 
     var dimension = this.dimension()
@@ -675,7 +675,7 @@ if (typeof jQuery === 'undefined') {
 
   Collapse.prototype.getParent = function () {
     return $(this.options.parent)
-      .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
+      .find('[httpOptions-toggle="collapse"][httpOptions-parent="' + this.options.parent + '"]')
       .each($.proxy(function (i, element) {
         var $element = $(element)
         this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
@@ -694,7 +694,7 @@ if (typeof jQuery === 'undefined') {
 
   function getTargetFromTrigger($trigger) {
     var href
-    var target = $trigger.attr('data-target')
+    var target = $trigger.attr('httpOptions-target')
       || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
 
     return $(target)
@@ -707,12 +707,12 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.collapse')
-      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var httpOptions    = $this.httpOptions('bs.collapse')
+      var options = $.extend({}, Collapse.DEFAULTS, $this.httpOptions(), typeof option == 'object' && option)
 
-      if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
-      if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
-      if (typeof option == 'string') data[option]()
+      if (!httpOptions && options.toggle && /show|hide/.test(option)) options.toggle = false
+      if (!httpOptions) $this.httpOptions('bs.collapse', (httpOptions = new Collapse(this, options)))
+      if (typeof option == 'string') httpOptions[option]()
     })
   }
 
@@ -734,14 +734,14 @@ if (typeof jQuery === 'undefined') {
   // COLLAPSE DATA-API
   // =================
 
-  $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+  $(document).on('click.bs.collapse.httpOptions-api', '[httpOptions-toggle="collapse"]', function (e) {
     var $this   = $(this)
 
-    if (!$this.attr('data-target')) e.preventDefault()
+    if (!$this.attr('httpOptions-target')) e.preventDefault()
 
     var $target = getTargetFromTrigger($this)
-    var data    = $target.data('bs.collapse')
-    var option  = data ? 'toggle' : $this.data()
+    var httpOptions    = $target.httpOptions('bs.collapse')
+    var option  = httpOptions ? 'toggle' : $this.httpOptions()
 
     Plugin.call($target, option)
   })
@@ -764,7 +764,7 @@ if (typeof jQuery === 'undefined') {
   // =========================
 
   var backdrop = '.dropdown-backdrop'
-  var toggle   = '[data-toggle="dropdown"]'
+  var toggle   = '[httpOptions-toggle="dropdown"]'
   var Dropdown = function (element) {
     $(element).on('click.bs.dropdown', this.toggle)
   }
@@ -772,7 +772,7 @@ if (typeof jQuery === 'undefined') {
   Dropdown.VERSION = '3.3.7'
 
   function getParent($this) {
-    var selector = $this.attr('data-target')
+    var selector = $this.attr('httpOptions-target')
 
     if (!selector) {
       selector = $this.attr('href')
@@ -880,10 +880,10 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this = $(this)
-      var data  = $this.data('bs.dropdown')
+      var httpOptions  = $this.httpOptions('bs.dropdown')
 
-      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
-      if (typeof option == 'string') data[option].call($this)
+      if (!httpOptions) $this.httpOptions('bs.dropdown', (httpOptions = new Dropdown(this)))
+      if (typeof option == 'string') httpOptions[option].call($this)
     })
   }
 
@@ -906,11 +906,11 @@ if (typeof jQuery === 'undefined') {
   // ===================================
 
   $(document)
-    .on('click.bs.dropdown.data-api', clearMenus)
-    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
-    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
-    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+    .on('click.bs.dropdown.httpOptions-api', clearMenus)
+    .on('click.bs.dropdown.httpOptions-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('click.bs.dropdown.httpOptions-api', toggle, Dropdown.prototype.toggle)
+    .on('keydown.bs.dropdown.httpOptions-api', toggle, Dropdown.prototype.keydown)
+    .on('keydown.bs.dropdown.httpOptions-api', '.dropdown-menu', Dropdown.prototype.keydown)
 
 }(jQuery);
 
@@ -981,7 +981,7 @@ if (typeof jQuery === 'undefined') {
     this.escape()
     this.resize()
 
-    this.$element.on('click.dismiss.bs.modal', '[data-dismiss="modal"]', $.proxy(this.hide, this))
+    this.$element.on('click.dismiss.bs.modal', '[httpOptions-dismiss="modal"]', $.proxy(this.hide, this))
 
     this.$dialog.on('mousedown.dismiss.bs.modal', function () {
       that.$element.one('mouseup.dismiss.bs.modal', function (e) {
@@ -1208,12 +1208,12 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option, _relatedTarget) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.modal')
-      var options = $.extend({}, Modal.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var httpOptions    = $this.httpOptions('bs.modal')
+      var options = $.extend({}, Modal.DEFAULTS, $this.httpOptions(), typeof option == 'object' && option)
 
-      if (!data) $this.data('bs.modal', (data = new Modal(this, options)))
-      if (typeof option == 'string') data[option](_relatedTarget)
-      else if (options.show) data.show(_relatedTarget)
+      if (!httpOptions) $this.httpOptions('bs.modal', (httpOptions = new Modal(this, options)))
+      if (typeof option == 'string') httpOptions[option](_relatedTarget)
+      else if (options.show) httpOptions.show(_relatedTarget)
     })
   }
 
@@ -1235,11 +1235,11 @@ if (typeof jQuery === 'undefined') {
   // MODAL DATA-API
   // ==============
 
-  $(document).on('click.bs.modal.data-api', '[data-toggle="modal"]', function (e) {
+  $(document).on('click.bs.modal.httpOptions-api', '[httpOptions-toggle="modal"]', function (e) {
     var $this   = $(this)
     var href    = $this.attr('href')
-    var $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) // strip for ie7
-    var option  = $target.data('bs.modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.data(), $this.data())
+    var $target = $($this.attr('httpOptions-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) // strip for ie7
+    var option  = $target.httpOptions('bs.modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.httpOptions(), $this.httpOptions())
 
     if ($this.is('a')) e.preventDefault()
 
@@ -1340,7 +1340,7 @@ if (typeof jQuery === 'undefined') {
   }
 
   Tooltip.prototype.getOptions = function (options) {
-    options = $.extend({}, this.getDefaults(), this.$element.data(), options)
+    options = $.extend({}, this.getDefaults(), this.$element.httpOptions(), options)
 
     if (options.delay && typeof options.delay == 'number') {
       options.delay = {
@@ -1365,11 +1365,11 @@ if (typeof jQuery === 'undefined') {
 
   Tooltip.prototype.enter = function (obj) {
     var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
+      obj : $(obj.currentTarget).httpOptions('bs.' + this.type)
 
     if (!self) {
       self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
+      $(obj.currentTarget).httpOptions('bs.' + this.type, self)
     }
 
     if (obj instanceof $.Event) {
@@ -1402,11 +1402,11 @@ if (typeof jQuery === 'undefined') {
 
   Tooltip.prototype.leave = function (obj) {
     var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
+      obj : $(obj.currentTarget).httpOptions('bs.' + this.type)
 
     if (!self) {
       self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
+      $(obj.currentTarget).httpOptions('bs.' + this.type, self)
     }
 
     if (obj instanceof $.Event) {
@@ -1458,7 +1458,7 @@ if (typeof jQuery === 'undefined') {
         .detach()
         .css({ top: 0, left: 0, display: 'block' })
         .addClass(placement)
-        .data('bs.' + this.type, this)
+        .httpOptions('bs.' + this.type, this)
 
       this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
       this.$element.trigger('inserted.bs.' + this.type)
@@ -1600,8 +1600,8 @@ if (typeof jQuery === 'undefined') {
 
   Tooltip.prototype.fixTitle = function () {
     var $e = this.$element
-    if ($e.attr('title') || typeof $e.attr('data-original-title') != 'string') {
-      $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
+    if ($e.attr('title') || typeof $e.attr('httpOptions-original-title') != 'string') {
+      $e.attr('httpOptions-original-title', $e.attr('title') || '').attr('title', '')
     }
   }
 
@@ -1671,7 +1671,7 @@ if (typeof jQuery === 'undefined') {
     var $e = this.$element
     var o  = this.options
 
-    title = $e.attr('data-original-title')
+    title = $e.attr('httpOptions-original-title')
       || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
 
     return title
@@ -1712,10 +1712,10 @@ if (typeof jQuery === 'undefined') {
   Tooltip.prototype.toggle = function (e) {
     var self = this
     if (e) {
-      self = $(e.currentTarget).data('bs.' + this.type)
+      self = $(e.currentTarget).httpOptions('bs.' + this.type)
       if (!self) {
         self = new this.constructor(e.currentTarget, this.getDelegateOptions())
-        $(e.currentTarget).data('bs.' + this.type, self)
+        $(e.currentTarget).httpOptions('bs.' + this.type, self)
       }
     }
 
@@ -1750,12 +1750,12 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.tooltip')
+      var httpOptions    = $this.httpOptions('bs.tooltip')
       var options = typeof option == 'object' && option
 
-      if (!data && /destroy|hide/.test(option)) return
-      if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
-      if (typeof option == 'string') data[option]()
+      if (!httpOptions && /destroy|hide/.test(option)) return
+      if (!httpOptions) $this.httpOptions('bs.tooltip', (httpOptions = new Tooltip(this, options)))
+      if (typeof option == 'string') httpOptions[option]()
     })
   }
 
@@ -1842,7 +1842,7 @@ if (typeof jQuery === 'undefined') {
     var $e = this.$element
     var o  = this.options
 
-    return $e.attr('data-content')
+    return $e.attr('httpOptions-content')
       || (typeof o.content == 'function' ?
             o.content.call($e[0]) :
             o.content)
@@ -1859,12 +1859,12 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.popover')
+      var httpOptions    = $this.httpOptions('bs.popover')
       var options = typeof option == 'object' && option
 
-      if (!data && /destroy|hide/.test(option)) return
-      if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
-      if (typeof option == 'string') data[option]()
+      if (!httpOptions && /destroy|hide/.test(option)) return
+      if (!httpOptions) $this.httpOptions('bs.popover', (httpOptions = new Popover(this, options)))
+      if (typeof option == 'string') httpOptions[option]()
     })
   }
 
@@ -1942,7 +1942,7 @@ if (typeof jQuery === 'undefined') {
       .find(this.selector)
       .map(function () {
         var $el   = $(this)
-        var href  = $el.data('target') || $el.attr('href')
+        var href  = $el.httpOptions('target') || $el.attr('href')
         var $href = /^#./.test(href) && $(href)
 
         return ($href
@@ -1993,7 +1993,7 @@ if (typeof jQuery === 'undefined') {
     this.clear()
 
     var selector = this.selector +
-      '[data-target="' + target + '"],' +
+      '[httpOptions-target="' + target + '"],' +
       this.selector + '[href="' + target + '"]'
 
     var active = $(selector)
@@ -2022,11 +2022,11 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.scrollspy')
+      var httpOptions    = $this.httpOptions('bs.scrollspy')
       var options = typeof option == 'object' && option
 
-      if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
-      if (typeof option == 'string') data[option]()
+      if (!httpOptions) $this.httpOptions('bs.scrollspy', (httpOptions = new ScrollSpy(this, options)))
+      if (typeof option == 'string') httpOptions[option]()
     })
   }
 
@@ -2048,10 +2048,10 @@ if (typeof jQuery === 'undefined') {
   // SCROLLSPY DATA-API
   // ==================
 
-  $(window).on('load.bs.scrollspy.data-api', function () {
-    $('[data-spy="scroll"]').each(function () {
+  $(window).on('load.bs.scrollspy.httpOptions-api', function () {
+    $('[httpOptions-spy="scroll"]').each(function () {
       var $spy = $(this)
-      Plugin.call($spy, $spy.data())
+      Plugin.call($spy, $spy.httpOptions())
     })
   })
 
@@ -2085,7 +2085,7 @@ if (typeof jQuery === 'undefined') {
   Tab.prototype.show = function () {
     var $this    = this.element
     var $ul      = $this.closest('ul:not(.dropdown-menu)')
-    var selector = $this.data('target')
+    var selector = $this.httpOptions('target')
 
     if (!selector) {
       selector = $this.attr('href')
@@ -2134,12 +2134,12 @@ if (typeof jQuery === 'undefined') {
         .find('> .dropdown-menu > .active')
           .removeClass('active')
         .end()
-        .find('[data-toggle="tab"]')
+        .find('[httpOptions-toggle="tab"]')
           .attr('aria-expanded', false)
 
       element
         .addClass('active')
-        .find('[data-toggle="tab"]')
+        .find('[httpOptions-toggle="tab"]')
           .attr('aria-expanded', true)
 
       if (transition) {
@@ -2154,7 +2154,7 @@ if (typeof jQuery === 'undefined') {
           .closest('li.dropdown')
             .addClass('active')
           .end()
-          .find('[data-toggle="tab"]')
+          .find('[httpOptions-toggle="tab"]')
             .attr('aria-expanded', true)
       }
 
@@ -2177,10 +2177,10 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this = $(this)
-      var data  = $this.data('bs.tab')
+      var httpOptions  = $this.httpOptions('bs.tab')
 
-      if (!data) $this.data('bs.tab', (data = new Tab(this)))
-      if (typeof option == 'string') data[option]()
+      if (!httpOptions) $this.httpOptions('bs.tab', (httpOptions = new Tab(this)))
+      if (typeof option == 'string') httpOptions[option]()
     })
   }
 
@@ -2208,8 +2208,8 @@ if (typeof jQuery === 'undefined') {
   }
 
   $(document)
-    .on('click.bs.tab.data-api', '[data-toggle="tab"]', clickHandler)
-    .on('click.bs.tab.data-api', '[data-toggle="pill"]', clickHandler)
+    .on('click.bs.tab.httpOptions-api', '[httpOptions-toggle="tab"]', clickHandler)
+    .on('click.bs.tab.httpOptions-api', '[httpOptions-toggle="pill"]', clickHandler)
 
 }(jQuery);
 
@@ -2232,8 +2232,8 @@ if (typeof jQuery === 'undefined') {
     this.options = $.extend({}, Affix.DEFAULTS, options)
 
     this.$target = $(this.options.target)
-      .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
-      .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
+      .on('scroll.bs.affix.httpOptions-api', $.proxy(this.checkPosition, this))
+      .on('click.bs.affix.httpOptions-api',  $.proxy(this.checkPositionWithEventLoop, this))
 
     this.$element     = $(element)
     this.affixed      = null
@@ -2334,11 +2334,11 @@ if (typeof jQuery === 'undefined') {
   function Plugin(option) {
     return this.each(function () {
       var $this   = $(this)
-      var data    = $this.data('bs.affix')
+      var httpOptions    = $this.httpOptions('bs.affix')
       var options = typeof option == 'object' && option
 
-      if (!data) $this.data('bs.affix', (data = new Affix(this, options)))
-      if (typeof option == 'string') data[option]()
+      if (!httpOptions) $this.httpOptions('bs.affix', (httpOptions = new Affix(this, options)))
+      if (typeof option == 'string') httpOptions[option]()
     })
   }
 
@@ -2361,16 +2361,16 @@ if (typeof jQuery === 'undefined') {
   // ==============
 
   $(window).on('load', function () {
-    $('[data-spy="affix"]').each(function () {
+    $('[httpOptions-spy="affix"]').each(function () {
       var $spy = $(this)
-      var data = $spy.data()
+      var httpOptions = $spy.httpOptions()
 
-      data.offset = data.offset || {}
+      httpOptions.offset = httpOptions.offset || {}
 
-      if (data.offsetBottom != null) data.offset.bottom = data.offsetBottom
-      if (data.offsetTop    != null) data.offset.top    = data.offsetTop
+      if (httpOptions.offsetBottom != null) httpOptions.offset.bottom = httpOptions.offsetBottom
+      if (httpOptions.offsetTop    != null) httpOptions.offset.top    = httpOptions.offsetTop
 
-      Plugin.call($spy, data)
+      Plugin.call($spy, httpOptions)
     })
   })
 

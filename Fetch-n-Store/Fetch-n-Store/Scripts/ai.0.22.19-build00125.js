@@ -242,11 +242,11 @@ var Microsoft;
                 }
                 return null;
             };
-            Util.setStorage = function (name, data) {
+            Util.setStorage = function (name, httpOptions) {
                 var storage = Util._getLocalStorageObject();
                 if (storage !== null) {
                     try {
-                        storage.setItem(name, data);
+                        storage.setItem(name, httpOptions);
                         return true;
                     }
                     catch (e) {
@@ -298,11 +298,11 @@ var Microsoft;
                 }
                 return null;
             };
-            Util.setSessionStorage = function (name, data) {
+            Util.setSessionStorage = function (name, httpOptions) {
                 var storage = Util._getSessionStorageObject();
                 if (storage !== null) {
                     try {
-                        storage.setItem(name, data);
+                        storage.setItem(name, httpOptions);
                         return true;
                     }
                     catch (e) {
@@ -698,7 +698,7 @@ var Microsoft;
                         }
                     }
                     catch (e) {
-                        ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxOpen, "Failed to monitor XMLHttpRequest.open, monitoring data for this ajax call may be incorrect.", {
+                        ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxOpen, "Failed to monitor XMLHttpRequest.open, monitoring httpOptions for this ajax call may be incorrect.", {
                             ajaxDiagnosticsMessage: AjaxMonitor.getFailedAjaxDiagnosticsMessage(this),
                             exception: Microsoft.ApplicationInsights.Util.dump(e)
                         }));
@@ -736,7 +736,7 @@ var Microsoft;
                         }
                     }
                     catch (e) {
-                        ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxSend, "Failed to monitor XMLHttpRequest, monitoring data for this ajax call may be incorrect.", {
+                        ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxSend, "Failed to monitor XMLHttpRequest, monitoring httpOptions for this ajax call may be incorrect.", {
                             ajaxDiagnosticsMessage: AjaxMonitor.getFailedAjaxDiagnosticsMessage(this),
                             exception: Microsoft.ApplicationInsights.Util.dump(e)
                         }));
@@ -762,7 +762,7 @@ var Microsoft;
                         }
                     }
                     catch (e) {
-                        ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxAbort, "Failed to monitor XMLHttpRequest.abort, monitoring data for this ajax call may be incorrect.", {
+                        ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxAbort, "Failed to monitor XMLHttpRequest.abort, monitoring httpOptions for this ajax call may be incorrect.", {
                             ajaxDiagnosticsMessage: AjaxMonitor.getFailedAjaxDiagnosticsMessage(this),
                             exception: Microsoft.ApplicationInsights.Util.dump(e)
                         }));
@@ -783,7 +783,7 @@ var Microsoft;
                     catch (e) {
                         var exceptionText = Microsoft.ApplicationInsights.Util.dump(e);
                         if (!exceptionText || exceptionText.toLowerCase().indexOf("c00c023f") == -1) {
-                            ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxRSC, "Failed to monitor XMLHttpRequest 'readystatechange' event handler, monitoring data for this ajax call may be incorrect.", {
+                            ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxRSC, "Failed to monitor XMLHttpRequest 'readystatechange' event handler, monitoring httpOptions for this ajax call may be incorrect.", {
                                 ajaxDiagnosticsMessage: AjaxMonitor.getFailedAjaxDiagnosticsMessage(xhr),
                                 exception: Microsoft.ApplicationInsights.Util.dump(e)
                             }));
@@ -796,7 +796,7 @@ var Microsoft;
                 xhr.ajaxData.status = xhr.status;
                 xhr.ajaxData.CalculateMetrics();
                 if (xhr.ajaxData.ajaxTotalDuration < 0) {
-                    ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.WARNING, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxDur, "Failed to calculate the duration of the ajax call, monitoring data for this ajax call won't be sent.", {
+                    ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.WARNING, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedMonitorAjaxDur, "Failed to calculate the duration of the ajax call, monitoring httpOptions for this ajax call won't be sent.", {
                         ajaxDiagnosticsMessage: AjaxMonitor.getFailedAjaxDiagnosticsMessage(xhr),
                         requestSentTime: xhr.ajaxData.requestSentTime,
                         responseFinishedTime: xhr.ajaxData.responseFinishedTime
@@ -1055,11 +1055,11 @@ var Microsoft;
                 "use strict";
                 var Envelope = (function (_super) {
                     __extends(Envelope, _super);
-                    function Envelope(data, name) {
+                    function Envelope(httpOptions, name) {
                         var _this = this;
                         _super.call(this);
                         this.name = Common.DataSanitizer.sanitizeString(name) || ApplicationInsights.Util.NotSpecified;
-                        this.data = data;
+                        this.httpOptions = httpOptions;
                         this.time = ApplicationInsights.Util.toISOStringForIE8(new Date());
                         this.aiDataContract = {
                             time: ApplicationInsights.FieldType.Required,
@@ -1069,7 +1069,7 @@ var Microsoft;
                                 return (_this.sampleRate == 100) ? ApplicationInsights.FieldType.Hidden : ApplicationInsights.FieldType.Required;
                             },
                             tags: ApplicationInsights.FieldType.Required,
-                            data: ApplicationInsights.FieldType.Required,
+                            httpOptions: ApplicationInsights.FieldType.Required,
                         };
                     }
                     return Envelope;
@@ -1371,7 +1371,7 @@ var Microsoft;
                 function Sample(sampleRate) {
                     this.INT_MAX_VALUE = 2147483647;
                     if (sampleRate > 100 || sampleRate < 0) {
-                        ApplicationInsights._InternalLogging.throwInternalUserActionable(ApplicationInsights.LoggingSeverity.WARNING, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.USRACT_SampleRateOutOfRange, "Sampling rate is out of range (0..100). Sampling will be disabled, you may be sending too much data which may affect your AI service level.", { samplingRate: sampleRate }));
+                        ApplicationInsights._InternalLogging.throwInternalUserActionable(ApplicationInsights.LoggingSeverity.WARNING, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.USRACT_SampleRateOutOfRange, "Sampling rate is out of range (0..100). Sampling will be disabled, you may be sending too much httpOptions which may affect your AI service level.", { samplingRate: sampleRate }));
                         this.sampleRate = 100;
                     }
                     this.sampleRate = sampleRate;
@@ -1698,7 +1698,7 @@ var Microsoft;
                     }
                 }
                 catch (e) {
-                    ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedToReportDataLoss, "Failed to report data loss: " + ApplicationInsights.Util.getExceptionName(e), { exception: ApplicationInsights.Util.dump(e) }));
+                    ApplicationInsights._InternalLogging.throwInternalNonUserActionable(ApplicationInsights.LoggingSeverity.CRITICAL, new ApplicationInsights._InternalLogMessage(ApplicationInsights._InternalMessageId.NONUSRACT_FailedToReportDataLoss, "Failed to report httpOptions loss: " + ApplicationInsights.Util.getExceptionName(e), { exception: ApplicationInsights.Util.dump(e) }));
                 }
                 finally {
                     try {
@@ -3032,14 +3032,14 @@ var Microsoft;
                 "use strict";
                 var Data = (function (_super) {
                     __extends(Data, _super);
-                    function Data(type, data) {
+                    function Data(type, httpOptions) {
                         _super.call(this);
                         this.aiDataContract = {
                             baseType: ApplicationInsights.FieldType.Required,
                             baseData: ApplicationInsights.FieldType.Required
                         };
                         this.baseType = type;
-                        this.baseData = data;
+                        this.baseData = httpOptions;
                     }
                     return Data;
                 })(Microsoft.Telemetry.Data);
@@ -3401,8 +3401,8 @@ var Microsoft;
                         }
                     }
                     var event = new ApplicationInsights.Telemetry.Event(name, properties, measurements);
-                    var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Event.dataType, event);
-                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.Event.envelopeType);
+                    var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Event.dataType, event);
+                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.Event.envelopeType);
                     _this.context.track(envelope);
                 };
                 this._pageTracking = new Timing("trackPageView");
@@ -3416,8 +3416,8 @@ var Microsoft;
             }
             AppInsights.prototype.sendPageViewInternal = function (name, url, duration, properties, measurements) {
                 var pageView = new ApplicationInsights.Telemetry.PageView(name, url, duration, properties, measurements);
-                var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.PageView.dataType, pageView);
-                var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.PageView.envelopeType);
+                var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.PageView.dataType, pageView);
+                var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.PageView.envelopeType);
                 this.context.track(envelope);
                 this._trackAjaxAttempts = 0;
             };
@@ -3484,8 +3484,8 @@ var Microsoft;
             AppInsights.prototype.trackEvent = function (name, properties, measurements) {
                 try {
                     var eventTelemetry = new ApplicationInsights.Telemetry.Event(name, properties, measurements);
-                    var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Event.dataType, eventTelemetry);
-                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.Event.envelopeType);
+                    var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Event.dataType, eventTelemetry);
+                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.Event.envelopeType);
                     this.context.track(envelope);
                 }
                 catch (e) {
@@ -3516,8 +3516,8 @@ var Microsoft;
                         }
                     }
                     var exceptionTelemetry = new ApplicationInsights.Telemetry.Exception(exception, handledAt, properties, measurements, severityLevel);
-                    var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Exception.dataType, exceptionTelemetry);
-                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.Exception.envelopeType);
+                    var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Exception.dataType, exceptionTelemetry);
+                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.Exception.envelopeType);
                     this.context.track(envelope);
                 }
                 catch (e) {
@@ -3527,8 +3527,8 @@ var Microsoft;
             AppInsights.prototype.trackMetric = function (name, average, sampleCount, min, max, properties) {
                 try {
                     var telemetry = new ApplicationInsights.Telemetry.Metric(name, average, sampleCount, min, max, properties);
-                    var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Metric.dataType, telemetry);
-                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.Metric.envelopeType);
+                    var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Metric.dataType, telemetry);
+                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.Metric.envelopeType);
                     this.context.track(envelope);
                 }
                 catch (e) {
@@ -3538,8 +3538,8 @@ var Microsoft;
             AppInsights.prototype.trackTrace = function (message, properties) {
                 try {
                     var telemetry = new ApplicationInsights.Telemetry.Trace(message, properties);
-                    var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Trace.dataType, telemetry);
-                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.Trace.envelopeType);
+                    var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Trace.dataType, telemetry);
+                    var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.Trace.envelopeType);
                     this.context.track(envelope);
                 }
                 catch (e) {
@@ -3577,8 +3577,8 @@ var Microsoft;
             AppInsights.prototype.SendCORSException = function (properties) {
                 var exceptionData = Microsoft.ApplicationInsights.Telemetry.Exception.CreateSimpleException("Script error.", "Error", "unknown", "unknown", "The browser's same-origin policy prevents us from getting the details of this exception.The exception occurred in a script loaded from an origin different than the web page.For cross- domain error reporting you can use crossorigin attribute together with appropriate CORS HTTP headers.For more information please see http://www.w3.org/TR/cors/.", 0, null);
                 exceptionData.properties = properties;
-                var data = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Exception.dataType, exceptionData);
-                var envelope = new ApplicationInsights.Telemetry.Common.Envelope(data, ApplicationInsights.Telemetry.Exception.envelopeType);
+                var httpOptions = new ApplicationInsights.Telemetry.Common.Data(ApplicationInsights.Telemetry.Exception.dataType, exceptionData);
+                var envelope = new ApplicationInsights.Telemetry.Common.Envelope(httpOptions, ApplicationInsights.Telemetry.Exception.envelopeType);
                 this.context.track(envelope);
             };
             AppInsights.prototype._onerror = function (message, url, lineNumber, columnNumber, error) {
