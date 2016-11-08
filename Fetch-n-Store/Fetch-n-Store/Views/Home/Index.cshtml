@@ -3,10 +3,6 @@
 }
 
 <div class="jumbotron">
-    @*<h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>*@
-
     <div class="text-center">
         <form name="myMethodForm">
             <label for="methodSelector"> Select a method: </label>
@@ -15,39 +11,15 @@
                     ng-model="httpOptions.selectedOption"></select>
             <input type="text" id="urlInput" width="200" name="name" value="" placeholder="Enter a URL" />
             <input type="submit" ng-click="initiateRequest()" class="btn-info" name="name" value="Fetch" />
-            <input type="submit" class="btn-danger" name="name" value="Store" />
+            <input type="submit" ng-click="storeResponse()" class="btn-danger" name="name" value="Store" />
             <input type="submit" ng-click="showAll()" class="btn-default" name="name" value="Show All" />
         </form>
     </div>
     <div id="error_display"></div>
     <div id="response_display">
-        @*<p>Data = {{content}}</p>*@
-        <p>Status = {{statusCode}}</p>
-        <p>URL = {{url}}</p>
-        <p>HTTP Method = {{methodUsed}}</p>
-        <p>Respone Time = {{responseTime}}</p>
-        @*<p>Status Message = {{statusText}}</p>*@
+        <p>Status = {{responseObject.StatusCode}}</p>
+        <p>URL = {{responseObject.URL}}</p>
+        <p>HTTP Method = {{responseObject.HTTP_Method}}</p>
+        <p>Respone Time = {{responseObject.ResponseTime}}</p>
     </div>
 </div>
-
-@*<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>*@

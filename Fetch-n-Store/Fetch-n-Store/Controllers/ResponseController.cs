@@ -20,10 +20,11 @@ namespace Fetch_n_Store.Controllers
         }
 
         // POST api/<controller>
-        public void Post([FromBody]dynamic data)
+        public dynamic Post([FromBody]dynamic data)
         {
-            Response response = new Response { StatusCode = data.StatusCode, URL = data.URL, HTTP_Method = data.HTTP_Method, ResponseTime = data.ResponseTime };
-            repo.AddNewResponse(response);
+            Response _response = new Response { StatusCode = data.StatusCode, URL = data.URL, HTTP_Method = data.HTTP_Method, ResponseTime = data.ResponseTime };
+            repo.AddNewResponse(_response);
+            return _response;
         }
 
         // PUT api/<controller>/5
